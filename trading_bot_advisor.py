@@ -11,7 +11,8 @@ import plotly.graph_objects as go
 import plotly.graph_objects as go
 import pandas as pd
 # Get the OpenAI API key from the environment variable
-openai.api_key = os.getenv('OPENAI_API_KEY')
+#openai.api_key = os.getenv('OPENAI_API_KEY')
+openai.api_key = streamlit.secrets["OPENAI_API_KEY"]
 
 # Initialize CoinGecko and GoogleNews
 cg = CoinGeckoAPI()
