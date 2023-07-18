@@ -43,7 +43,6 @@ if cryptos_input:
     news_dict = {}
     for term in cryptos:
         googlenews.search(term)
-        googlenews.get_page(date_input.strftime('%m/%d/%Y'))
         news_dict[term] = googlenews.results()
         googlenews.clear()
 
