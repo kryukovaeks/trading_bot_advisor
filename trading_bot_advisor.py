@@ -7,6 +7,7 @@ import datetime as dt
 from pycoingecko import CoinGeckoAPI
 from GoogleNews import GoogleNews
 import os
+import plotly.graph_objects as go
 
 # Get the OpenAI API key from the environment variable
 openai.api_key = os.getenv('OPENAI_API_KEY')
@@ -22,10 +23,9 @@ st.write('set the environment variable in their shell before running the script.
 cryptos_input = st.text_input('Enter cryptos (comma separated):')
 days_input = st.slider('Number of days for price analysis:', min_value=1, max_value=365, value=30)
 date_input = st.date_input('News date:')
+
 if cryptos_input:
     cryptos = [crypto.strip() for crypto in cryptos_input.split(',')]
-
-
     # Get historical data and plot it
     crypto_data = ''
     for crypto in cryptos:
@@ -37,7 +37,15 @@ if cryptos_input:
         low = min(prices_only)
         avg = np.mean(prices_only)
         crypto_data += f" {crypto} data for the past {days_input} days: High={high}, Low={low}, Average={avg}\n"
-        st.line_chart(data={"price": prices_only}, width=0, height=0, use_container_width=True)
+        
+        # Plotly
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=dates, y=prices_only, mode='lines', name=crypto))
+        fig.update_layout(title=f'{crypto} Price Chart for Last {days_input} Days',
+                          xaxis_title='Date',
+                          yaxis_title='Price (USD)')
+        st.plotly_chart(fig)
+
 
     # Get news
     news_dict = {}
