@@ -91,7 +91,8 @@ if cryptos_input:
     selected_columns = st.multiselect("Select columns", df.columns)
 
     if selected_columns:
-        st.dataframe(df[selected_columns])
+        df_selected = df[selected_columns]
+        st.markdown(df_selected.to_html(escape=False), unsafe_allow_html=True)
 
 
 
