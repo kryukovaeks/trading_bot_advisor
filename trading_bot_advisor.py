@@ -17,7 +17,7 @@ openai.api_key = st.secrets["OPENAI_API_KEY"]
 
 # Initialize CoinGecko and GoogleNews
 cg = CoinGeckoAPI()
-
+st.set_page_config(layout='wide') 
 
 # Define streamlit elements
 st.title('Crypto Analyzer')
@@ -89,7 +89,7 @@ if cryptos_input:
     pd.set_option('display.max_colwidth', None)
 
     selected_columns = st.multiselect("Select columns", df.columns)
-
+  
     if selected_columns:
         df_selected = df[selected_columns]
         st.markdown(df_selected.to_html(escape=False), unsafe_allow_html=True)
