@@ -10,6 +10,9 @@ import os
 import plotly.graph_objects as go
 import plotly.graph_objects as go
 import pandas as pd
+from plotly.subplots import make_subplots
+import plotly.graph_objects as go
+
 # Get the OpenAI API key from the environment variable
 #openai.api_key = os.getenv('OPENAI_API_KEY')
 openai.api_key = st.secrets["OPENAI_API_KEY"]
