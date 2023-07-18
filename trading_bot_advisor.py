@@ -84,10 +84,14 @@ if cryptos_input:
     df = news_data.sort_values(by =['crypto','datetime'])
 
 
-    # Display the filtered dataframe
-    #st.dataframe(df)
-    selected_column = st.selectbox("Select a column", df.columns)
-    st.write(df[selected_column])
+    selected_columns = st.multiselect("Select columns", df.columns)
+
+    if selected_columns:
+        st.dataframe(df[selected_columns])
+        for column in selected_columns:
+            st.write(f"Full content of {column}:")
+            st.write(df[column].values.tolist())
+
 
 
 
