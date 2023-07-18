@@ -6,6 +6,10 @@ import numpy as np
 import datetime as dt
 from pycoingecko import CoinGeckoAPI
 from GoogleNews import GoogleNews
+import os
+
+# Get the OpenAI API key from the environment variable
+openai.api_key = os.getenv('OPENAI_API_KEY')
 
 # Initialize CoinGecko and GoogleNews
 cg = CoinGeckoAPI()
@@ -14,7 +18,7 @@ googlenews = GoogleNews()
 # Define streamlit elements
 st.title('Crypto Analyzer')
 st.write('Enter your parameters below:')
-
+st.write('set the environment variable in their shell before running the script. ')
 cryptos_input = st.text_input('Enter cryptos (comma separated):')
 days_input = st.slider('Number of days for price analysis:', min_value=1, max_value=365, value=30)
 date_input = st.date_input('News date:')
