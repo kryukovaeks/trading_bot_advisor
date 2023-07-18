@@ -28,23 +28,34 @@ if cryptos_input:
     cryptos = [crypto.strip() for crypto in cryptos_input.split(',')]
     # Get historical data and plot it
     crypto_data = ''
-    for crypto in cryptos:
+import plotly.graph_objects as go
+
+# ...
+
+fig = go.Figure()
+
+for crypto in cryptos:
+    try:
         data = cg.get_coin_market_chart_by_id(crypto, vs_currency='usd', days=days_input)
         prices = data['prices']
-        dates = [dt.datetime.utcfromtimestamp(price[0]/1000).date() for price in prices]
         prices_only = [price[1] for price in prices]
+        time_stamps = [price[0] for price in prices]
+        dates = [datetime.fromtimestamp(time_stamp/1000) for time_stamp in time_stamps]
         high = max(prices_only)
         low = min(prices_only)
         avg = np.mean(prices_only)
         crypto_data += f" {crypto} data for the past {days_input} days: High={high}, Low={low}, Average={avg}\n"
-        
-        # Plotly
-        fig = go.Figure()
+        st.write(f"{crypto} data for the past {days_input} days: High={high}, Low={low}, Average={avg}")
+
+        # Add a trace for this cryptocurrency
         fig.add_trace(go.Scatter(x=dates, y=prices_only, mode='lines', name=crypto))
-        fig.update_layout(title=f'{crypto} Price Chart for Last {days_input} Days',
-                          xaxis_title='Date',
-                          yaxis_title='Price (USD)')
-        st.plotly_chart(fig)
+
+    except Exception as e:
+        st.error(f"An error occurred when fetching data for {crypto}: {str(e)}")
+
+# Show the figure with the graph
+st.plotly_chart(fig)
+
 
 
     from dateutil.parser import parse
