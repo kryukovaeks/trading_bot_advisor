@@ -62,7 +62,7 @@ from dateutil.parser import parse
 
 news_dict = {}
 for term in cryptos:
-    googlenews.search(term)
+    googlenews.search(term.capitalise())
     googlenews.get_page(1)
     news_dict[term] = googlenews.results()
     googlenews.clear()
