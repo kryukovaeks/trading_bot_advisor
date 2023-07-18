@@ -72,6 +72,7 @@ for term in cryptos:
 for term, news_list in news_dict.items():
     print(f"News for {term}:")
     for news in news_list:
+        print(news_output) 
         st.markdown(news)
 #st.markdown(news_output)
 
