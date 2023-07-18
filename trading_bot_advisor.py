@@ -55,7 +55,7 @@ if cryptos_input:
 
 
 
-    from dateutil.parser import parse
+
 
     news_dict = {}
 
@@ -65,12 +65,28 @@ if cryptos_input:
         news_dict[term] = googlenews.results()
         googlenews.clear()
 
-    # Print the news for each term
+    # Create a list to hold the news data
+    news_data = []
+
+    # Append the news data to the list
     for term, news_list in news_dict.items():
-        st.markdown(f"News for {term}:")
         for news in news_list:
-            st.markdown(news)
-    #st.markdown(news_output)
+            news_data = pd.concat([news_data, pd.DataFrame(news)], axis=0, index_col=False)
+            news_data[term]=term
+
+    # Get the date input from the user
+    #date_input = pd.to_datetime(date_input)  # Replace with the actual date input
+
+    # Sort the dataframe by the 'datetime' column
+    df = news_data.sort_values('datetime')
+
+    # Filter the dataframe for dates later than the date input
+    filtered_df = df[df['datetime'] > date_input]
+
+    # Display the filtered dataframe
+    st.dataframe(filtered_df)
+
+
 
 
     '''
