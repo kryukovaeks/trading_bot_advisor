@@ -27,6 +27,7 @@ date_input = st.date_input('News date:')
 
 if cryptos_input:
     cryptos = [crypto.strip() for crypto in cryptos_input.split(',')]
+    crypto_data=''
 
     fig = go.Figure()
 
