@@ -53,8 +53,8 @@ for crypto in cryptos:
     except Exception as e:
         st.error(f"An error occurred when fetching data for {crypto}: {str(e)}")
 
-# Show the figure with the graph
-st.plotly_chart(fig)
+    # Show the figure with the graph
+    st.plotly_chart(fig)
 
 
 
