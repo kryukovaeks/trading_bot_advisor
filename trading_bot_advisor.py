@@ -81,11 +81,14 @@ if cryptos_input:
     #date_input = pd.to_datetime(date_input)  # Replace with the actual date input
 
     # Sort the dataframe by the 'datetime' column
-    df = news_data.sort_values('datetime')
+    df = news_data.sort_values(by =['crypto','datetime'])
 
 
     # Display the filtered dataframe
-    st.dataframe(df)
+    #st.dataframe(df)
+    selected_column = st.selectbox("Select a column", df.columns)
+    st.write(df[selected_column])
+
 
 
 
@@ -145,5 +148,6 @@ if cryptos_input:
 
     res = response.choices[0].message["content"]
     res = res.replace("\\", "")
+    st.write("ChatGPT advise:")
     st.write(textwrap.fill(str(res), width=50))
 
