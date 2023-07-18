@@ -24,11 +24,6 @@ Clone the repository:
 git clone http://github.com/yourusername/cryptotradingbot
 ```
 
-Navigate to the project directory:
-```
-cd cryptotradingbot
-```
-
 Create a `secrets.toml` file in your project's root directory and insert your OpenAI API key as shown below:
 ```
 [default]
