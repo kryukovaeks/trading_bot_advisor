@@ -65,8 +65,7 @@ for term in cryptos:
     googlenews.search(term.capitalize())
     googlenews.get_page(1)
     news_dict[term] = googlenews.results()
-    googlenews.clear()
-st.markdown(news_dict)
+
 # Print news
 news_output = ''
 for term, news_list in news_dict.items():
