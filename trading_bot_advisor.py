@@ -13,6 +13,7 @@ import pandas as pd
 # Get the OpenAI API key from the environment variable
 #openai.api_key = os.getenv('OPENAI_API_KEY')
 openai.api_key = st.secrets["OPENAI_API_KEY"]
+#st.write("OPENAI_API_KEY", st.secrets["OPENAI_API_KEY"])
 
 # Initialize CoinGecko and GoogleNews
 cg = CoinGeckoAPI()
