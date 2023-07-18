@@ -17,7 +17,7 @@ openai.api_key = st.secrets["OPENAI_API_KEY"]
 
 # Initialize CoinGecko and GoogleNews
 cg = CoinGeckoAPI()
-st.set_page_config(layout='wide') 
+#st.set_page_config(layout='wide') 
 
 # Define streamlit elements
 st.title('Crypto Analyzer')
