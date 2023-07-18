@@ -63,8 +63,8 @@ if cryptos_input:
             # Parse the date from the news item
             news_date = parse(news['date'])
             # Filter out news older than the input date
-            if news_date.date() >= date_input:
-                news_output += f"- {news['date']}: {news['title']} - {news['media']}\n"
+            #if news_date.date() >= date_input:
+            news_output += f"- {news['date']}: {news['title']} - {news['media']}\n"
     st.markdown(news_output)
 
 
