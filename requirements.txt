@@ -1,0 +1,7 @@
+streamlit==1.0.0
+matplotlib==3.4.3
+numpy==1.21.2
+pycoingecko==2.2.0
+GoogleNews==1.5.8
+openai==0.27.0
+textwrap3==0.9.2
