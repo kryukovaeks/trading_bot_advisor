@@ -68,7 +68,7 @@ if cryptos_input:
     st.markdown(news_output)
 
 
-
+'''
     # AI prompt
     base_prompt = f"""
     You are in control of my crypto trading profile. You should take into consideration the factors you have to determine the best trade. Here is the info:
@@ -124,4 +124,4 @@ if cryptos_input:
     res = response.choices[0].message["content"]
     res = res.replace("\\", "")
     st.write(textwrap.fill(str(res), width=50))
-
+'''
