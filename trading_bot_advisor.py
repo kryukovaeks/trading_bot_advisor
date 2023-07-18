@@ -47,7 +47,8 @@ if cryptos_input:
         st.plotly_chart(fig)
 
 
-    # Get news
+    from dateutil.parser import parse
+
     news_dict = {}
     for term in cryptos:
         googlenews.search(term)
@@ -59,11 +60,16 @@ if cryptos_input:
     for term, news_list in news_dict.items():
         news_output += f"News for {term}:\n"
         for news in news_list:
-            news_output += f"{news['title']} - {news['media']}\n"
+            # Parse the date from the news item
+            news_date = parse(news['date'])
+            # Filter out news older than the input date
+            if news_date.date() >= date_input:
+                news_output += f"- {news['date']}: {news['title']} - {news['media']}\n"
+    st.markdown(news_output)
+
+
 
     # AI prompt
-    openai.api_key = 'YOUR_OPENAI_API_KEY'
-
     base_prompt = f"""
     You are in control of my crypto trading profile. You should take into consideration the factors you have to determine the best trade. Here is the info:
 
