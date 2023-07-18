@@ -8,6 +8,7 @@ from pycoingecko import CoinGeckoAPI
 from GoogleNews import GoogleNews
 import os
 import plotly.graph_objects as go
+import plotly.graph_objects as go
 
 # Get the OpenAI API key from the environment variable
 openai.api_key = os.getenv('OPENAI_API_KEY')
@@ -28,7 +29,6 @@ if cryptos_input:
     cryptos = [crypto.strip() for crypto in cryptos_input.split(',')]
     # Get historical data and plot it
     crypto_data = ''
-import plotly.graph_objects as go
 
 # ...
 
@@ -58,25 +58,25 @@ for crypto in cryptos:
 
 
 
-    from dateutil.parser import parse
+from dateutil.parser import parse
 
-    news_dict = {}
-    for term in cryptos:
-        googlenews.search(term)
-        news_dict[term] = googlenews.results()
-        googlenews.clear()
+news_dict = {}
+for term in cryptos:
+    googlenews.search(term)
+    news_dict[term] = googlenews.results()
+    googlenews.clear()
 
-    # Print news
-    news_output = ''
-    for term, news_list in news_dict.items():
-        news_output += f"News for {term}:\n"
-        for news in news_list:
-            # Parse the date from the news item
-            news_date = parse(news['date'])
-            # Filter out news older than the input date
-            #if news_date.date() >= date_input:
-            news_output += f"- {news['date']}: {news['title']} - {news['media']}\n"
-    st.markdown(news_output)
+# Print news
+news_output = ''
+for term, news_list in news_dict.items():
+    news_output += f"News for {term}:\n"
+    for news in news_list:
+        # Parse the date from the news item
+        news_date = parse(news['date'])
+        # Filter out news older than the input date
+        #if news_date.date() >= date_input:
+        news_output += f"- {news['date']}: {news['title']} - {news['media']}\n"
+st.markdown(news_output)
 
 
 '''
