@@ -31,6 +31,7 @@ days_input = st.slider('Number of days for price analysis:', min_value=1, max_va
 
 if cryptos_input:
     cryptos = [crypto.strip() for crypto in cryptos_input.split(',')]
+    crypto_data=''
     from plotly.subplots import make_subplots
 
     # Create subplots: each row represents a different crypto
