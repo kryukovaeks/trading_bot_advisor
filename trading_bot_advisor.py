@@ -17,7 +17,7 @@ openai.api_key = st.secrets["OPENAI_API_KEY"]
 
 # Initialize CoinGecko and GoogleNews
 cg = CoinGeckoAPI()
-#st.set_page_config(layout='wide') 
+st.set_page_config(layout='wide') 
 
 # Define streamlit elements
 st.title('Crypto Analyzer')
@@ -59,7 +59,7 @@ if cryptos_input:
 
 
     news_dict = {}
-    googlenews = GoogleNews(period=f'{days_input}d')
+    googlenews = GoogleNews(period=f'7d')
     for term in cryptos:
         googlenews.search(term)
         googlenews.get_page(1)
@@ -81,7 +81,7 @@ if cryptos_input:
     #date_input = pd.to_datetime(date_input)  # Replace with the actual date input
 
     # Sort the dataframe by the 'datetime' column
-    df = news_data #.sort_values(by =['crypto','datetime'])
+    df = news_data.sort_values(by =['crypto','datetime'])
 
 
 
