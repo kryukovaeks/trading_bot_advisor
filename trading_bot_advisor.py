@@ -9,7 +9,7 @@ from GoogleNews import GoogleNews
 import os
 import plotly.graph_objects as go
 import plotly.graph_objects as go
-
+import pandas as pd
 # Get the OpenAI API key from the environment variable
 openai.api_key = os.getenv('OPENAI_API_KEY')
 
