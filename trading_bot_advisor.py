@@ -84,13 +84,15 @@ if cryptos_input:
     df = news_data.sort_values(by =['crypto','datetime'])
 
 
+
+    # Expand the maximum width of each cell to display more content
+    pd.set_option('display.max_colwidth', None)
+
     selected_columns = st.multiselect("Select columns", df.columns)
 
     if selected_columns:
         st.dataframe(df[selected_columns])
-        for column in selected_columns:
-            st.write(f"Full content of {column}:")
-            st.write(df[column].values.tolist())
+
 
 
 
