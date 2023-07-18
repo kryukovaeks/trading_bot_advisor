@@ -71,7 +71,7 @@ if cryptos_input:
     # Append the news data to the list
     for term, news_list in news_dict.items():
         for news in news_list:
-            news_data = pd.concat([news_data, pd.DataFrame(news)], axis=0, index_col=False)
+            news_data = pd.concat([news_data, pd.DataFrame(news)], axis=0, ignore_index=True)
             news_data[term]=term
 
     # Get the date input from the user
