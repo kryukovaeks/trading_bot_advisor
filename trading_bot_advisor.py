@@ -15,7 +15,7 @@ openai.api_key = os.getenv('OPENAI_API_KEY')
 
 # Initialize CoinGecko and GoogleNews
 cg = CoinGeckoAPI()
-googlenews = GoogleNews()
+
 
 # Define streamlit elements
 st.title('Crypto Analyzer')
@@ -23,7 +23,6 @@ st.write('Enter your parameters below:')
 st.write('set the environment variable in their shell before running the script. ')
 cryptos_input = st.text_input('Enter cryptos (comma separated):')
 days_input = st.slider('Number of days for price analysis:', min_value=1, max_value=365, value=30)
-date_input = st.date_input('News date:')
 
 if cryptos_input:
     cryptos = [crypto.strip() for crypto in cryptos_input.split(',')]
@@ -58,7 +57,7 @@ if cryptos_input:
 
 
     news_dict = {}
-
+    googlenews = GoogleNews(period=f'{days_input}d')
     for term in cryptos:
         googlenews.search(term)
         googlenews.get_page(1)
@@ -80,11 +79,9 @@ if cryptos_input:
     # Sort the dataframe by the 'datetime' column
     df = news_data.sort_values('datetime')
 
-    # Filter the dataframe for dates later than the date input
-    filtered_df = df[df['datetime'] > date_input]
 
     # Display the filtered dataframe
-    st.dataframe(filtered_df)
+    st.dataframe(df)
 
 
 
