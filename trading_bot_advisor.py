@@ -27,12 +27,13 @@ cryptos_input = st.text_input('Enter cryptos (comma separated):')
 days_input = st.slider('Number of days for price analysis:', min_value=1, max_value=365, value=30)
 
 if cryptos_input:
-    cryptos = [crypto.strip() for crypto in cryptos_input.split(',')]
-    crypto_data=''
+    from plotly.subplots import make_subplots
 
-    fig = go.Figure()
+    # Create subplots: each row represents a different crypto
+    fig = make_subplots(rows=len(cryptos), cols=1)
 
-    for crypto in cryptos:
+    # Add traces (one trace per crypto)
+    for i, crypto in enumerate(cryptos, start=1):
         try:
             data = cg.get_coin_market_chart_by_id(crypto, vs_currency='usd', days=days_input)
             prices = data['prices']
@@ -45,17 +46,15 @@ if cryptos_input:
             crypto_data += f" {crypto} data for the past {days_input} days: High={high}, Low={low}, Average={avg}\n"
             st.write(f"{crypto} data for the past {days_input} days: High={high}, Low={low}, Average={avg}")
 
-            # Add a trace for this cryptocurrency
-            fig.add_trace(go.Scatter(x=dates, y=prices_only, mode='lines', name=crypto))
+            # Add a trace for this cryptocurrency to the i-th subplot
+            fig.add_trace(go.Scatter(x=dates, y=prices_only, mode='lines', name=crypto), row=i, col=1)
 
         except Exception as e:
             st.error(f"An error occurred when fetching data for {crypto}: {str(e)}")
 
-    # Set y-axis to logarithmic scale
-    fig.update_yaxes(type="log")
-
-    # Show the figure with the graph
+    # Show the figure with the graphs
     st.plotly_chart(fig)
+
 
 
 
