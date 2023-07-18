@@ -40,7 +40,7 @@ for crypto in cryptos:
         prices = data['prices']
         prices_only = [price[1] for price in prices]
         time_stamps = [price[0] for price in prices]
-        dates = [datetime.fromtimestamp(time_stamp/1000) for time_stamp in time_stamps]
+        dates = [dt.fromtimestamp(time_stamp/1000) for time_stamp in time_stamps]
         high = max(prices_only)
         low = min(prices_only)
         avg = np.mean(prices_only)
