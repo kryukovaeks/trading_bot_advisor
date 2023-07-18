@@ -20,7 +20,7 @@ cg = CoinGeckoAPI()
 st.set_page_config(layout='wide') 
 
 # Define streamlit elements
-st.title('Crypto Analyzer')
+st.title('Crypto Trading Bot Advisor')
 st.write('Enter your parameters below:')
 st.write('set the environment variable in their shell before running the script. ')
 cryptos_input = st.text_input('Enter cryptos (comma separated):')
@@ -51,8 +51,11 @@ if cryptos_input:
         except Exception as e:
             st.error(f"An error occurred when fetching data for {crypto}: {str(e)}")
 
-        # Show the figure with the graph
-        st.plotly_chart(fig)
+    # Set y-axis to logarithmic scale
+    fig.update_yaxes(type="log")
+
+    # Show the figure with the graph
+    st.plotly_chart(fig)
 
 
 
