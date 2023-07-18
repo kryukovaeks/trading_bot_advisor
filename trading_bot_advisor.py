@@ -61,22 +61,19 @@ for crypto in cryptos:
 from dateutil.parser import parse
 
 news_dict = {}
+
 for term in cryptos:
-    googlenews.search(term.capitalize())
+    googlenews.search(term)
     googlenews.get_page(1)
     news_dict[term] = googlenews.results()
+    googlenews.clear()
 
-# Print news
-news_output = ''
+# Print the news for each term
 for term, news_list in news_dict.items():
-    news_output += f"News for {term}:\n"
+    print(f"News for {term}:")
     for news in news_list:
-        # Parse the date from the news item
-        news_date = news['datetime']
-        # Filter out news older than the input date
-        #if news_date.date() >= date_input:
-        news_output += f"- {news['datetime']}: {news['title']} - {news['media']}\n"
-st.markdown(news_output)
+        st.markdown(news)
+#st.markdown(news_output)
 
 
 '''
