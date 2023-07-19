@@ -37,79 +37,114 @@ max_budget = st.number_input('Maximum budget ($):', min_value=10.0, max_value=10
 cryptos_input = st.text_input('Enter cryptos (comma separated):')
 days_input = st.slider('Number of days for price analysis:', min_value=1, max_value=365, value=30)
 
+if cryptos_input:
+    cryptos = [crypto.strip() for crypto in cryptos_input.split(',')]
+    crypto_data=''
+    from plotly.subplots import make_subplots
 
-@st.cache(allow_output_mutation=True)
-def fetch_crypto_data(cryptos, days_input):
-    crypto_data = {}
+    # Create subplots: each row represents a different crypto
     fig = make_subplots(rows=len(cryptos), cols=1)
-    for crypto in cryptos:
+
+    # Add traces (one trace per crypto)
+    for i, crypto in enumerate(cryptos, start=1):
         try:
             data = cg.get_coin_market_chart_by_id(crypto, vs_currency='usd', days=days_input)
-            crypto_data[crypto] = data
+            prices = data['prices']
+            prices_only = [price[1] for price in prices]
+            time_stamps = [price[0] for price in prices]
+            dates = [dt.datetime.fromtimestamp(time_stamp/1000) for time_stamp in time_stamps]
+            high = max(prices_only)
+            low = min(prices_only)
+            avg = np.mean(prices_only)
+            crypto_data += f" {crypto} prices for the past {days_input} days: High={high}, Low={low}, Average={avg}\n"
+            st.write(f"{crypto} prices for the past {days_input} days: High={high}, Low={low}, Average={avg}")
+
+            # Add a trace for this cryptocurrency to the i-th subplot
+            fig.add_trace(go.Scatter(x=dates, y=prices_only, mode='lines', name=crypto), row=i, col=1)
+
         except Exception as e:
             st.error(f"An error occurred when fetching data for {crypto}: {str(e)}")
-    return crypto_data, fig
 
-@st.cache(allow_output_mutation=True)
-def fetch_news_data(cryptos):
+    # Show the figure with the graphs
+    st.plotly_chart(fig)
+
+
+
+
+
+
     news_dict = {}
-    googlenews = GoogleNews(period='7d')
-    googlenews.enableException(True)
-    for term in cryptos:
-        try:
+    try:
+        googlenews = GoogleNews(period='7d')
+        googlenews.enableException(True)
+
+        for term in cryptos:
+            
             googlenews.search(term.capitalize())
             googlenews.get_page(1)
             news_dict[term] = googlenews.results()
             googlenews.clear()
+
+            #st.write(term)
+            #st.write(news_dict[term])
             time.sleep(5)
-        except Exception as e:
-            st.error(str(e))
-    return news_dict
+        # Create a list to hold the news data
+        news_data = pd.DataFrame()
 
-if cryptos_input:
-    cryptos = [crypto.strip() for crypto in cryptos_input.split(',')]
-    crypto_data, fig = fetch_crypto_data(cryptos, days_input)
+        # Append the news data to the list
+        for term, news_list in news_dict.items():
+            for news in news_list:
+                news_data_i = pd.DataFrame([news])
+                news_data_i['crypto']=term
+                news_data = pd.concat([news_data, news_data_i], axis=0, ignore_index=True)
+            
 
-    for i, crypto in enumerate(cryptos, start=1):
-        prices = crypto_data[crypto]['prices']
-        prices_only = [price[1] for price in prices]
-        time_stamps = [price[0] for price in prices]
-        dates = [dt.datetime.fromtimestamp(time_stamp/1000) for time_stamp in time_stamps]
-        fig.add_trace(go.Scatter(x=dates, y=prices_only, mode='lines', name=crypto), row=i, col=1)
-    st.plotly_chart(fig)
-if cryptos_input:
-    cryptos = [crypto.strip() for crypto in cryptos_input.split(',')]
-    crypto_data, fig = fetch_crypto_data(cryptos, days_input)
+        # Get the date input from the user
+        #date_input = pd.to_datetime(date_input)  # Replace with the actual date input
 
-    for i, crypto in enumerate(cryptos, start=1):
-        prices = crypto_data[crypto]['prices']
-        prices_only = [price[1] for price in prices]
-        time_stamps = [price[0] for price in prices]
-        dates = [dt.datetime.fromtimestamp(time_stamp/1000) for time_stamp in time_stamps]
-        fig.add_trace(go.Scatter(x=dates, y=prices_only, mode='lines', name=crypto), row=i, col=1)
-    st.plotly_chart(fig)
+        # Sort the dataframe by the 'datetime' column
+        #st.write(news_data)
 
-    news_data_dict = fetch_news_data(cryptos)
-    news_data = pd.DataFrame()
-    for term, news_list in news_data_dict.items():
-        for news in news_list:
-            news_data_i = pd.DataFrame([news])
-            news_data_i['crypto'] = term
-            news_data = pd.concat([news_data, news_data_i], axis=0, ignore_index=True)
+        df = news_data.sort_values(by =['crypto','datetime'], ascending=False).groupby(['title']).head(1).drop_duplicates()
 
-    df = news_data.sort_values(by=['crypto', 'datetime'], ascending=False).groupby(['title']).head(1).drop_duplicates()
 
-    if 'selected_columns' not in st.session_state:
-        st.session_state.selected_columns = ['title', 'date', 'crypto']
-    selected_columns = st.multiselect("Select columns", df.columns, default=st.session_state.selected_columns)
-    st.session_state.selected_columns = selected_columns
 
-    if selected_columns:
-        df_selected = df[selected_columns]
-        html_table = df_selected.to_html(escape=False, index=False)
-        html_table_with_scroll = f"""<div style="height:300px;overflow:auto;">{html_table}</div>"""
-        st.markdown(html_table_with_scroll, unsafe_allow_html=True)
+        # Expand the maximum width of each cell to display more content
+        pd.set_option('display.max_colwidth', None)
 
+    
+        # Check if the selected columns are in the session state. If not, initialize it.
+        if 'selected_columns' not in st.session_state:
+            st.session_state.selected_columns = ['title', 'date', 'crypto']
+
+        # Update the multiselect widget to use session state.
+        selected_columns = st.multiselect("Select columns", df.columns, default=st.session_state.selected_columns)
+        st.session_state.selected_columns = selected_columns
+
+        if selected_columns:
+            df_selected = df[selected_columns]
+            html_table = df_selected.to_html(escape=False, index=False)
+
+            # Wrap the HTML table in a div with fixed height and overflow
+            html_table_with_scroll = f"""
+            <div style="height:300px;overflow:auto;">
+                {html_table}
+            </div>
+            """
+
+            # Use Streamlit's markdown renderer to display the wrapped table
+            st.markdown(html_table_with_scroll, unsafe_allow_html=True)
+    except Exception as e:
+        st.error(e)
+
+
+
+
+
+
+
+
+    # AI prompt
     base_prompt = f"""
     You are in control of my crypto trading profile. You should take into consideration the factors you have to determine the best trade. Here is the info:
 
@@ -137,6 +172,9 @@ if cryptos_input:
     Here are the data sources:
 
     """
+
+    info_str = f"Historical statistics for {days_input} days: {crypto_data}\n News: {news_data[['title','crypto']].drop_duplicates()}"
+    prompt = base_prompt + "\n\n" + info_str
     user_prompt = """
     What should we do to make the most amount of profit based on the info? Here are your options for a response.
 
@@ -154,24 +192,17 @@ if cryptos_input:
     !do not forget to explain
         """
 
-    # Here we add logic to only prompt GPT if the data changes.
-    if ('previous_cryptos' not in st.session_state or 'previous_days' not in st.session_state or 
-        cryptos_input != st.session_state.previous_cryptos or days_input != st.session_state.previous_days):
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": prompt},
+            {"role": "user", "content": user_prompt}
+        ],
+        temperature = 0.2,
+    )
 
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": base_prompt},
-                {"role": "user", "content": user_prompt}
-            ],
-            temperature=0.2,
-        )
-        res = response.choices[0].message["content"].replace("\\", "")
-        st.write("ChatGPT advise:")
-        st.write(textwrap.fill(str(res), width=50))
-        st.session_state.previous_cryptos = cryptos_input
-        st.session_state.previous_days = days_input
-
-
-
+    res = response.choices[0].message["content"]
+    res = res.replace("\\", "")
+    st.write("ChatGPT advise:")
+    st.write(textwrap.fill(str(res), width=50))
 
