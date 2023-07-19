@@ -187,7 +187,7 @@ if cryptos_input:
     CRITICAL: RESPOND IN ONLY THE ABOVE FORMAT. EXAMPLE: buy_crypto_price("ETH", 100). 
     ALSO IN THE AMOUNT FIELD, USE THE UNIT SYSTEM OF DOLLARS. ASSUME WE HAVE A BUDGET of UP TO ${max_budget} WORTH OF dollar PER TRADE for 24 hours.
 
-    !give execution for every crypto
+    !give execution for every crypto at the beginning
     !do not forget to explain
         """
 
