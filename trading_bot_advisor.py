@@ -76,6 +76,7 @@ if cryptos_input:
     news_dict = {}
     try:
         googlenews = GoogleNews(period='7d')
+        googlenews.enableException(True)
 
         for term in cryptos:
             googlenews.search(term.capitalize())
