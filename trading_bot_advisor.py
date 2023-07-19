@@ -170,7 +170,7 @@ if cryptos_input:
     4. sell_crypto_limit(symbol, amount, limit) This will set a limit order to sell the specified amount of the specified cryptocurrency if it reaches the specified limit.
     5. do_nothing() Use this when you don't see any necessary changes.
     
-    Choose one and explain
+    Choose one (firstly write the execution command) and explain
         """
 
     response = openai.ChatCompletion.create(
