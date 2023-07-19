@@ -96,7 +96,7 @@ if cryptos_input:
     #date_input = pd.to_datetime(date_input)  # Replace with the actual date input
 
     # Sort the dataframe by the 'datetime' column
-    df = news_data.sort_values(by =['crypto','datetime'], ascending=False).drop_duplicates()
+    df = news_data.sort_values(by =['crypto','datetime'], ascending=False).groupby(['title']).head(1).drop_duplicates()
 
 
 
