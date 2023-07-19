@@ -76,7 +76,6 @@ if cryptos_input:
     news_dict = {}
     try:
         googlenews = GoogleNews(period='7d')
-        googlenews.setUserAgent('Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:91.0) Gecko/20100101 Firefox/91.0')
 
         for term in cryptos:
             googlenews.search(term)
