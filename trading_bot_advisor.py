@@ -169,7 +169,7 @@ if cryptos_input:
     3. sell_crypto_price(symbol, amount) This will sell the specified amount of the specified cryptocurrency.
     4. sell_crypto_limit(symbol, amount, limit) This will set a limit order to sell the specified amount of the specified cryptocurrency if it reaches the specified limit.
     5. do_nothing() Use this when you don't see any necessary changes.
-    You have to provide symbol, amount.
+    You have to provide amount.
     Choose one and explain
         """
 
