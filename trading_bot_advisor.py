@@ -37,35 +37,7 @@ max_budget = st.number_input('Maximum budget ($):', min_value=10.0, max_value=10
 cryptos_input = st.text_input('Enter cryptos (comma separated):')
 days_input = st.slider('Number of days for price analysis:', min_value=1, max_value=365, value=30)
 
-"""if cryptos_input:
-    cryptos = [crypto.strip() for crypto in cryptos_input.split(',')]
-    crypto_data=''
-    from plotly.subplots import make_subplots
 
-    # Create subplots: each row represents a different crypto
-    fig = make_subplots(rows=len(cryptos), cols=1)
-
-    # Add traces (one trace per crypto)
-    for i, crypto in enumerate(cryptos, start=1):
-        try:
-            data = cg.get_coin_market_chart_by_id(crypto, vs_currency='usd', days=days_input)
-            prices = data['prices']
-            prices_only = [price[1] for price in prices]
-            time_stamps = [price[0] for price in prices]
-            dates = [dt.datetime.fromtimestamp(time_stamp/1000) for time_stamp in time_stamps]
-            high = max(prices_only)
-            low = min(prices_only)
-            avg = np.mean(prices_only)
-            crypto_data += f" {crypto} prices for the past {days_input} days: High={high}, Low={low}, Average={avg}\n"
-            st.write(f"{crypto} prices for the past {days_input} days: High={high}, Low={low}, Average={avg}")
-
-            # Add a trace for this cryptocurrency to the i-th subplot
-            fig.add_trace(go.Scatter(x=dates, y=prices_only, mode='lines', name=crypto), row=i, col=1)
-
-        except Exception as e:
-            st.error(f"An error occurred when fetching data for {crypto}: {str(e)}")
-    # Show the figure with the graphs
-    st.plotly_chart(fig)"""
 @st.cache
 def fetch_crypto_data(cryptos, days_input):
     crypto_data = {}
