@@ -54,8 +54,8 @@ if cryptos_input:
             high = max(prices_only)
             low = min(prices_only)
             avg = np.mean(prices_only)
-            crypto_data += f" {crypto} data for the past {days_input} days: High={high}, Low={low}, Average={avg}\n"
-            st.write(f"{crypto} data for the past {days_input} days: High={high}, Low={low}, Average={avg}")
+            crypto_data += f" {crypto} prices for the past {days_input} days: High={high}, Low={low}, Average={avg}\n"
+            st.write(f"{crypto} prices for the past {days_input} days: High={high}, Low={low}, Average={avg}")
 
             # Add a trace for this cryptocurrency to the i-th subplot
             fig.add_trace(go.Scatter(x=dates, y=prices_only, mode='lines', name=crypto), row=i, col=1)
@@ -159,7 +159,7 @@ if cryptos_input:
 
     """
 
-    info_str = f"Historical statistic for {days_input} days: {crypto_data}\n News: {news_data['title'].tolist()}"
+    info_str = f"Historical statistics for {days_input} days: {crypto_data}\n News: {news_data['title','crypto']}"
     prompt = base_prompt + "\n\n" + info_str
     user_prompt = """
     What should we do to make the most amount of profit based on the info? Here are your options for a response.
