@@ -12,7 +12,8 @@ import plotly.graph_objects as go
 import pandas as pd
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
-
+import requests
+import time
 
 st.set_page_config(layout='wide') 
 
@@ -74,45 +75,19 @@ if cryptos_input:
 
 
     news_dict = {}
-    import requests
-    from random import choice
+    try:
+        googlenews = GoogleNews(period='7d')
+        googlenews.enableException(True)
 
-    # List of proxies
-    proxy_list = ['proxy1', 'proxy2', 'proxy3']  # Replace with your list of proxies
+        for term in cryptos:
+            time.sleep(5)
+            googlenews.search(term.capitalize())
+            googlenews.get_page(1)
+            news_dict[term] = googlenews.results()
+            googlenews.clear()
 
-    def make_request(url, proxy):
-        proxies = {
-            'http': proxy,
-            'https': proxy
-        }
-        try:
-            response = requests.get(url, proxies=proxies)
-            # Process the response here
-            return response.text
-        except requests.exceptions.RequestException as e:
-            print('Error:', e)
-            return None
-
-    def switch_proxy():
-        return choice(proxy_list)
-
-    googlenews = GoogleNews(period='7d')
-    googlenews.enableException(True)
-
-    for term in cryptos:
-        googlenews.search(term.capitalize())
-
-        # Switch proxy for each search term
-        proxy = switch_proxy()
-
-        # Make the request using the selected proxy
-        googlenews.get_page(1, proxy=proxy)
-
-        news_dict[term] = googlenews.results()
-        googlenews.clear()
-
-
-
+            st.write(term)
+            st.write(news_dict[term])
         # Create a list to hold the news data
         news_data = pd.DataFrame()
 
@@ -123,8 +98,7 @@ if cryptos_input:
                 news_data_i['crypto']=term
                 news_data = pd.concat([news_data, news_data_i], axis=0, ignore_index=True)
             
-        st.write(term)
-        st.write(news_dict[term])
+
         # Get the date input from the user
         #date_input = pd.to_datetime(date_input)  # Replace with the actual date input
 
