@@ -125,8 +125,8 @@ if cryptos_input:
 
             # Use Streamlit's markdown renderer to display the wrapped table
             st.markdown(html_table_with_scroll, unsafe_allow_html=True)
-        except Exception as e:
-            st.error(e)
+    except Exception as e:
+        st.error(e)
 
 
 
