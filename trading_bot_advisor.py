@@ -74,56 +74,59 @@ if cryptos_input:
 
 
     news_dict = {}
-    googlenews = GoogleNews(period=f'7d')
-    for term in cryptos:
-        googlenews.search(term)
-        googlenews.get_page(1)
-        news_dict[term] = googlenews.results()
-        googlenews.clear()
+    try:
+        googlenews = GoogleNews(period=f'7d')
+        for term in cryptos:
+            googlenews.search(term)
+            googlenews.get_page(1)
+            news_dict[term] = googlenews.results()
+            googlenews.clear()
 
-    # Create a list to hold the news data
-    news_data = pd.DataFrame()
+        # Create a list to hold the news data
+        news_data = pd.DataFrame()
 
-    # Append the news data to the list
-    for term, news_list in news_dict.items():
-        for news in news_list:
-            news_data_i = pd.DataFrame([news])
-            news_data_i['crypto']=term
-            news_data = pd.concat([news_data, news_data_i], axis=0, ignore_index=True)
-        
+        # Append the news data to the list
+        for term, news_list in news_dict.items():
+            for news in news_list:
+                news_data_i = pd.DataFrame([news])
+                news_data_i['crypto']=term
+                news_data = pd.concat([news_data, news_data_i], axis=0, ignore_index=True)
+            
 
-    # Get the date input from the user
-    #date_input = pd.to_datetime(date_input)  # Replace with the actual date input
+        # Get the date input from the user
+        #date_input = pd.to_datetime(date_input)  # Replace with the actual date input
 
-    # Sort the dataframe by the 'datetime' column
-    df = news_data.groupby(['title']).head(1).drop_duplicates() #.sort_values(by =['datetime'], ascending=False)
+        # Sort the dataframe by the 'datetime' column
+        df = news_data.sort_values(by =['crypto','datetime'], ascending=False).groupby(['title']).head(1).drop_duplicates()
 
 
 
-    # Expand the maximum width of each cell to display more content
-    pd.set_option('display.max_colwidth', None)
-    # Define default columns
-    default_columns = ['title', 'date']
+        # Expand the maximum width of each cell to display more content
+        pd.set_option('display.max_colwidth', None)
+        # Define default columns
+        default_columns = ['title', 'date']
 
-    # Check if each default column exists in the DataFrame, and filter out the ones that don't
-    default_columns = [col for col in default_columns if col in df.columns]
+        # Check if each default column exists in the DataFrame, and filter out the ones that don't
+        default_columns = [col for col in default_columns if col in df.columns]
 
-    selected_columns = st.multiselect("Select columns", df.columns,default = default_columns)
-  
-    if selected_columns:
-        df_selected = df[selected_columns]
-        # Convert your DataFrame to an HTML table
-        html_table = df_selected.to_html(escape=False, index=False)
+        selected_columns = st.multiselect("Select columns", df.columns,default = default_columns)
+    
+        if selected_columns:
+            df_selected = df[selected_columns]
+            # Convert your DataFrame to an HTML table
+            html_table = df_selected.to_html(escape=False, index=False)
 
-        # Wrap the HTML table in a div with fixed height and overflow
-        html_table_with_scroll = f"""
-        <div style="height:300px;overflow:auto;">
-            {html_table}
-        </div>
-        """
+            # Wrap the HTML table in a div with fixed height and overflow
+            html_table_with_scroll = f"""
+            <div style="height:300px;overflow:auto;">
+                {html_table}
+            </div>
+            """
 
-        # Use Streamlit's markdown renderer to display the wrapped table
-        st.markdown(html_table_with_scroll, unsafe_allow_html=True)
+            # Use Streamlit's markdown renderer to display the wrapped table
+            st.markdown(html_table_with_scroll, unsafe_allow_html=True)
+        except Exception as e:
+            st.error(e)
 
 
 
