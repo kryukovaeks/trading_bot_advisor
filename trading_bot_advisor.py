@@ -74,15 +74,43 @@ if cryptos_input:
 
 
     news_dict = {}
-    try:
-        googlenews = GoogleNews(period='7d')
-        googlenews.enableException(True)
+    import requests
+    from random import choice
 
-        for term in cryptos:
-            googlenews.search(term.capitalize())
-            googlenews.get_page(1)
-            news_dict[term] = googlenews.results()
-            googlenews.clear()
+    # List of proxies
+    proxy_list = ['proxy1', 'proxy2', 'proxy3']  # Replace with your list of proxies
+
+    def make_request(url, proxy):
+        proxies = {
+            'http': proxy,
+            'https': proxy
+        }
+        try:
+            response = requests.get(url, proxies=proxies)
+            # Process the response here
+            return response.text
+        except requests.exceptions.RequestException as e:
+            print('Error:', e)
+            return None
+
+    def switch_proxy():
+        return choice(proxy_list)
+
+    googlenews = GoogleNews(period='7d')
+    googlenews.enableException(True)
+
+    for term in cryptos:
+        googlenews.search(term.capitalize())
+
+        # Switch proxy for each search term
+        proxy = switch_proxy()
+
+        # Make the request using the selected proxy
+        googlenews.get_page(1, proxy=proxy)
+
+        news_dict[term] = googlenews.results()
+        googlenews.clear()
+
 
             st.write(term)
             st.write(news_dict[term])
