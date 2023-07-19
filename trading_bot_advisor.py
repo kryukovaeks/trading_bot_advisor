@@ -171,7 +171,7 @@ if cryptos_input:
     5. do_nothing() Use this when you don't see any necessary changes.
     
     Choose one (firstly write the execution command) and explain
-    CRITICAL: RESPOND IN ONLY THE ABOVE FORMAT. EXAMPLE: buy_crypto_price("ETHBTC", 0.1). 
+    CRITICAL: RESPOND IN ONLY THE ABOVE FORMAT. EXAMPLE: buy_crypto_price("ETH", 0.1). 
     ALSO IN THE AMOUNT FIELD, USE THE UNIT SYSTEM OF DOLLARS. ASSUME WE HAVE A BUDGET of UP TO $100 WORTH OF BITCOIN PER TRADE for 24 hours.
     ADD THE ACRONYM "BTC" AT THE END OF THE CRYPTO TICKER.
         """
