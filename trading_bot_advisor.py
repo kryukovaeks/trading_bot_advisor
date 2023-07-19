@@ -16,8 +16,7 @@ import plotly.graph_objects as go
 
 st.set_page_config(layout='wide') 
 
-if openai_key_input:
-    openai.api_key = openai_key_input
+
 #openai.api_key = os.getenv('OPENAI_API_KEY')
 #openai.api_key = st.secrets["OPENAI_API_KEY"]
 #st.write("OPENAI_API_KEY", st.secrets["OPENAI_API_KEY"])
@@ -28,13 +27,12 @@ cg = CoinGeckoAPI()
 # Define streamlit elements
 st.title('Crypto Trading Bot Advisor')
 st.write('Enter your parameters below:')
-
-
-max_budget = st.number_input('Maximum budget ($):', min_value=10.0, max_value=10000.0, value=100.0)
-# Get the OpenAI API key from the environment variable
 # Ask user for OpenAI API Key
 openai_key_input = st.text_input("Enter your OpenAI API Key:", type="password")  # Using type="password" hides the entered characters
+if openai_key_input:
+    openai.api_key = openai_key_input
 
+max_budget = st.number_input('Maximum budget ($):', min_value=10.0, max_value=10000.0, value=100.0)
 st.write('set the environment variable in their shell before running the script. ')
 cryptos_input = st.text_input('Enter cryptos (comma separated):')
 days_input = st.slider('Number of days for price analysis:', min_value=1, max_value=365, value=30)
