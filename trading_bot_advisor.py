@@ -80,7 +80,7 @@ if cryptos_input:
         googlenews.enableException(True)
 
         for term in cryptos:
-            time.sleep(5)
+            
             googlenews.search(term.capitalize())
             googlenews.get_page(1)
             news_dict[term] = googlenews.results()
@@ -88,6 +88,7 @@ if cryptos_input:
 
             st.write(term)
             st.write(news_dict[term])
+            time.sleep(5)
         # Create a list to hold the news data
         news_data = pd.DataFrame()
 
