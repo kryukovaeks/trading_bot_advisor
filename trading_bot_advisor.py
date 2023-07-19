@@ -111,17 +111,18 @@ if cryptos_input:
 
         # Expand the maximum width of each cell to display more content
         pd.set_option('display.max_colwidth', None)
-        # Define default columns
-        default_columns = ['title', 'date','crypto']
 
-        # Check if each default column exists in the DataFrame, and filter out the ones that don't
-        default_columns = [col for col in default_columns if col in df.columns]
-
-        selected_columns = st.multiselect("Select columns", df.columns,default = default_columns)
     
+        # Check if the selected columns are in the session state. If not, initialize it.
+        if 'selected_columns' not in st.session_state:
+            st.session_state.selected_columns = ['title', 'date', 'crypto']
+
+        # Update the multiselect widget to use session state.
+        selected_columns = st.multiselect("Select columns", df.columns, default=st.session_state.selected_columns)
+        st.session_state.selected_columns = selected_columns
+
         if selected_columns:
             df_selected = df[selected_columns]
-            # Convert your DataFrame to an HTML table
             html_table = df_selected.to_html(escape=False, index=False)
 
             # Wrap the HTML table in a div with fixed height and overflow
