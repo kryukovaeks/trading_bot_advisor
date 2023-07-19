@@ -78,7 +78,7 @@ if cryptos_input:
         googlenews = GoogleNews(period='7d')
 
         for term in cryptos:
-            googlenews.search(term)
+            googlenews.search(term.capitalize())
             googlenews.get_page(1)
             news_dict[term] = googlenews.results()
             googlenews.clear()
