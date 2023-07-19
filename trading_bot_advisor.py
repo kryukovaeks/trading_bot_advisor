@@ -100,8 +100,13 @@ if cryptos_input:
 
     # Expand the maximum width of each cell to display more content
     pd.set_option('display.max_colwidth', None)
+    # Define default columns
+    default_columns = ['title', 'date']
 
-    selected_columns = st.multiselect("Select columns", df.columns,default = [['title','date']])
+    # Check if each default column exists in the DataFrame, and filter out the ones that don't
+    default_columns = [col for col in default_columns if col in df.columns]
+
+    selected_columns = st.multiselect("Select columns", df.columns,default = default_columns)
   
     if selected_columns:
         df_selected = df[selected_columns]
