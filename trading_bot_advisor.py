@@ -34,7 +34,6 @@ if openai_key_input:
     openai.api_key = openai_key_input
 
 max_budget = st.number_input('Maximum budget ($):', min_value=10.0, max_value=10000.0, value=100.0)
-st.write('set the environment variable in their shell before running the script. ')
 cryptos_input = st.text_input('Enter cryptos (comma separated):')
 days_input = st.slider('Number of days for price analysis:', min_value=1, max_value=365, value=30)
 
