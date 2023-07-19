@@ -159,7 +159,7 @@ if cryptos_input:
 
     """
 
-    info_str = f"Historical data: {crypto_data}\n News: {news_data['title'].tolist()}"
+    info_str = f"Historical prices for {days_input} days: {prices}\n News: {news_data['title'].tolist()}"
     prompt = base_prompt + "\n\n" + info_str
     user_prompt = """
     What should we do to make the most amount of profit based on the info? Here are your options for a response.
