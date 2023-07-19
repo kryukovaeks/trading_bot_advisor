@@ -101,7 +101,7 @@ if cryptos_input:
     # Expand the maximum width of each cell to display more content
     pd.set_option('display.max_colwidth', None)
 
-    selected_columns = st.multiselect("Select columns", df.columns,default = df.columns.tolist())
+    selected_columns = st.multiselect("Select columns", df.columns,default = [['title','date']])
   
     if selected_columns:
         df_selected = df[selected_columns]
