@@ -112,8 +112,7 @@ if cryptos_input:
         googlenews.clear()
 
 
-            st.write(term)
-            st.write(news_dict[term])
+
         # Create a list to hold the news data
         news_data = pd.DataFrame()
 
@@ -124,7 +123,8 @@ if cryptos_input:
                 news_data_i['crypto']=term
                 news_data = pd.concat([news_data, news_data_i], axis=0, ignore_index=True)
             
-
+        st.write(term)
+        st.write(news_dict[term])
         # Get the date input from the user
         #date_input = pd.to_datetime(date_input)  # Replace with the actual date input
 
