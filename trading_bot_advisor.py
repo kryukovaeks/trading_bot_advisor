@@ -203,11 +203,11 @@ if cryptos_input:
 
     res = response.choices[0].message["content"]
     res = res.replace("\\", "")
-    st.markdown("### ChatGPT Advice:")
-
     # Create a horizontal separator for visual clarity
     st.markdown("---")
-
+    
+    
+    st.markdown("### ChatGPT Advice:")
     # Use a markdown block to display the advice
     st.markdown(f"> {textwrap.fill(str(res), width=50)}")
 
