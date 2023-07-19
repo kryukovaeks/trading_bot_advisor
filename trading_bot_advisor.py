@@ -37,7 +37,7 @@ max_budget = st.number_input('Maximum budget ($):', min_value=10.0, max_value=10
 cryptos_input = st.text_input('Enter cryptos (comma separated):')
 days_input = st.slider('Number of days for price analysis:', min_value=1, max_value=365, value=30)
 
-if cryptos_input:
+"""if cryptos_input:
     cryptos = [crypto.strip() for crypto in cryptos_input.split(',')]
     crypto_data=''
     from plotly.subplots import make_subplots
@@ -64,9 +64,21 @@ if cryptos_input:
 
         except Exception as e:
             st.error(f"An error occurred when fetching data for {crypto}: {str(e)}")
-
     # Show the figure with the graphs
-    st.plotly_chart(fig)
+    st.plotly_chart(fig)"""
+@st.cache
+def fetch_crypto_data(cryptos, days_input):
+    crypto_data = {}
+    fig = make_subplots(rows=len(cryptos), cols=1)
+    for crypto in cryptos:
+        try:
+            data = cg.get_coin_market_chart_by_id(crypto, vs_currency='usd', days=days_input)
+            crypto_data[crypto] = data
+        except Exception as e:
+            st.error(f"An error occurred when fetching data for {crypto}: {str(e)}")
+    return crypto_data, fig
+
+
 
 
 
