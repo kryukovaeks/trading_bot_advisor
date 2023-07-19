@@ -119,19 +119,6 @@ if cryptos_input:
 
         selected_columns = st.multiselect("Select columns", df.columns,default = default_columns)
     
-        # Check if 'selected_columns' is already in the session state
-        if 'selected_columns' not in st.session_state:
-            st.session_state.selected_columns = ['title', 'date']
-
-        # Check if each default column exists in the DataFrame, and filter out the ones that don't
-        default_columns = [col for col in ['title', 'date'] if col in df.columns]
-
-        selected_columns = st.multiselect("Select columns", df.columns, default=st.session_state.selected_columns, key="unique_key_1")
-
-
-        # Update the session state with the new selection
-        st.session_state.selected_columns = selected_columns
-
         if selected_columns:
             df_selected = df[selected_columns]
             # Convert your DataFrame to an HTML table
@@ -146,7 +133,6 @@ if cryptos_input:
 
             # Use Streamlit's markdown renderer to display the wrapped table
             st.markdown(html_table_with_scroll, unsafe_allow_html=True)
-
     except Exception as e:
         st.error(e)
 
