@@ -94,14 +94,14 @@ if cryptos_input:
     #date_input = pd.to_datetime(date_input)  # Replace with the actual date input
 
     # Sort the dataframe by the 'datetime' column
-    df = news_data.sort_values(by =['crypto','datetime'])
+    df = news_data.sort_values(by =['crypto','datetime'], ascending=False)
 
 
 
     # Expand the maximum width of each cell to display more content
     pd.set_option('display.max_colwidth', None)
 
-    selected_columns = st.multiselect("Select columns", df.columns)
+    selected_columns = st.multiselect("Select columns", df.columns,default = df.columns.tolist())
   
     if selected_columns:
         df_selected = df[selected_columns]
