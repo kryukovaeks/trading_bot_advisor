@@ -111,7 +111,7 @@ if cryptos_input:
     if selected_columns:
         df_selected = df[selected_columns]
         # Convert your DataFrame to an HTML table
-        html_table = df_selected.to_html(escape=False)
+        html_table = df_selected.to_html(escape=False, index=False)
 
         # Wrap the HTML table in a div with fixed height and overflow
         html_table_with_scroll = f"""
@@ -159,7 +159,7 @@ if cryptos_input:
 
     """
 
-    info_str = f"Historical prices for {days_input} days: {prices}\n News: {news_data['title'].tolist()}"
+    info_str = f"Historical statistic for {days_input} days: {crypto_data}\n News: {news_data['title'].tolist()}"
     prompt = base_prompt + "\n\n" + info_str
     user_prompt = """
     What should we do to make the most amount of profit based on the info? Here are your options for a response.
