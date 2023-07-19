@@ -38,7 +38,7 @@ cryptos_input = st.text_input('Enter cryptos (comma separated):')
 days_input = st.slider('Number of days for price analysis:', min_value=1, max_value=365, value=30)
 
 
-@st.cache
+@st.cache(allow_output_mutation=True)
 def fetch_crypto_data(cryptos, days_input):
     crypto_data = {}
     fig = make_subplots(rows=len(cryptos), cols=1)
@@ -50,7 +50,7 @@ def fetch_crypto_data(cryptos, days_input):
             st.error(f"An error occurred when fetching data for {crypto}: {str(e)}")
     return crypto_data, fig
 
-@st.cache
+@st.cache(allow_output_mutation=True)
 def fetch_news_data(cryptos):
     news_dict = {}
     googlenews = GoogleNews(period='7d')
