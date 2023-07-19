@@ -173,6 +173,8 @@ if cryptos_input:
     Choose one (firstly write the execution command) and explain
     CRITICAL: RESPOND IN ONLY THE ABOVE FORMAT. EXAMPLE: buy_crypto_price("ETH", 100). 
     ALSO IN THE AMOUNT FIELD, USE THE UNIT SYSTEM OF DOLLARS. ASSUME WE HAVE A BUDGET of UP TO $100 WORTH OF BITCOIN PER TRADE for 24 hours.
+    !give execution for every crypto
+    !do not forget to explain
         """
 
     response = openai.ChatCompletion.create(
