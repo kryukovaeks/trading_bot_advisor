@@ -15,9 +15,6 @@ import plotly.graph_objects as go
 
 
 st.set_page_config(layout='wide') 
-# Get the OpenAI API key from the environment variable
-# Ask user for OpenAI API Key
-openai_key_input = st.text_input("Enter your OpenAI API Key:", type="password")  # Using type="password" hides the entered characters
 
 if openai_key_input:
     openai.api_key = openai_key_input
@@ -31,6 +28,13 @@ cg = CoinGeckoAPI()
 # Define streamlit elements
 st.title('Crypto Trading Bot Advisor')
 st.write('Enter your parameters below:')
+
+
+max_budget = st.number_input('Maximum budget ($):', min_value=10.0, max_value=10000.0, value=100.0)
+# Get the OpenAI API key from the environment variable
+# Ask user for OpenAI API Key
+openai_key_input = st.text_input("Enter your OpenAI API Key:", type="password")  # Using type="password" hides the entered characters
+
 st.write('set the environment variable in their shell before running the script. ')
 cryptos_input = st.text_input('Enter cryptos (comma separated):')
 days_input = st.slider('Number of days for price analysis:', min_value=1, max_value=365, value=30)
@@ -172,7 +176,8 @@ if cryptos_input:
     
     Choose one (firstly write the execution command) and explain
     CRITICAL: RESPOND IN ONLY THE ABOVE FORMAT. EXAMPLE: buy_crypto_price("ETH", 100). 
-    ALSO IN THE AMOUNT FIELD, USE THE UNIT SYSTEM OF DOLLARS. ASSUME WE HAVE A BUDGET of UP TO $100 WORTH OF BITCOIN PER TRADE for 24 hours.
+    ALSO IN THE AMOUNT FIELD, USE THE UNIT SYSTEM OF DOLLARS. ASSUME WE HAVE A BUDGET of UP TO ${max_budget} WORTH OF BITCOIN PER TRADE for 24 hours.
+
     !give execution for every crypto
     !do not forget to explain
         """
