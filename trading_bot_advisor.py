@@ -126,7 +126,8 @@ if cryptos_input:
         # Check if each default column exists in the DataFrame, and filter out the ones that don't
         default_columns = [col for col in ['title', 'date'] if col in df.columns]
 
-        selected_columns = st.multiselect("Select columns", df.columns, default=st.session_state.selected_columns)
+        selected_columns = st.multiselect("Select columns", df.columns, default=st.session_state.selected_columns, key="unique_key_1")
+
 
         # Update the session state with the new selection
         st.session_state.selected_columns = selected_columns
