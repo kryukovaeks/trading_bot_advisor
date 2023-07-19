@@ -13,6 +13,8 @@ import pandas as pd
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
 
+
+st.set_page_config(layout='wide') 
 # Get the OpenAI API key from the environment variable
 # Ask user for OpenAI API Key
 openai_key_input = st.text_input("Enter your OpenAI API Key:", type="password")  # Using type="password" hides the entered characters
@@ -23,9 +25,8 @@ if openai_key_input:
 #openai.api_key = st.secrets["OPENAI_API_KEY"]
 #st.write("OPENAI_API_KEY", st.secrets["OPENAI_API_KEY"])
 
-# Initialize CoinGecko and GoogleNews
+# Initialize CoinGecko 
 cg = CoinGeckoAPI()
-st.set_page_config(layout='wide') 
 
 # Define streamlit elements
 st.title('Crypto Trading Bot Advisor')
