@@ -110,7 +110,18 @@ if cryptos_input:
   
     if selected_columns:
         df_selected = df[selected_columns]
-        st.markdown(df_selected.to_html(escape=False), unsafe_allow_html=True)
+        # Convert your DataFrame to an HTML table
+        html_table = df_selected.to_html(escape=False)
+
+        # Wrap the HTML table in a div with fixed height and overflow
+        html_table_with_scroll = f"""
+        <div style="height:300px;overflow:auto;">
+            {html_table}
+        </div>
+        """
+
+        # Use Streamlit's markdown renderer to display the wrapped table
+        st.markdown(html_table_with_scroll, unsafe_allow_html=True)
 
 
 
