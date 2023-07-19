@@ -84,6 +84,7 @@ if cryptos_input:
             googlenews.clear()
 
             st.write(term)
+            st.write(news_dict[term])
         # Create a list to hold the news data
         news_data = pd.DataFrame()
 
