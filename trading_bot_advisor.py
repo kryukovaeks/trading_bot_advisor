@@ -240,20 +240,20 @@ typed_tickers = [ticker.strip().upper() for ticker in typed_tickers if ticker]
 # 3. Combine
 all_selected_tickers = list(set(selected_tickers_from_dropdown + typed_tickers))
 
-
+# Suppress warnings
+warnings.filterwarnings('ignore')
+start_date = st.date_input('Start Date', dt.date(2020, 1, 1))
+end_date = st.date_input('End Date', dt.date.today())
+amount = st.number_input('Amount:', min_value=100.0, value=10000.0)
 # Add a button to initiate backtesting
-if st.button("Run Backtest") and all_selected_tickers:
+if st.button("Run Backtest") and all_selected_tickers and start_date and end_date and amount:
     # Convert the tickers to the format used in the backtesting
     filtered_pairs = [ticker + '-USD' for ticker in all_selected_tickers]
 
     # Display header for backtesting section
     st.markdown("## Backtesting Results")
 
-    # Suppress warnings
-    warnings.filterwarnings('ignore')
-    start_date = st.date_input('Start Date', dt.date(2020, 1, 1))
-    end_date = st.date_input('End Date', dt.date.today())
-    amount = st.number_input('Amount:', min_value=100.0, value=10000.0)
+
     
     # Input for filtered_pairs
 
