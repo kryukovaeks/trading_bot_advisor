@@ -7,7 +7,7 @@
 # The Python Quants GmbH
 #
 from utils.BacktestBase import *
-
+import streamlit as st
 
 class BacktestLongOnly(BacktestBase):
         

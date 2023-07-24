@@ -10,7 +10,7 @@ import numpy as np
 import pandas as pd
 from pylab import mpl, plt
 import yfinance as yf
-
+import streamlit as st
 
 plt.style.use('seaborn')
 mpl.rcParams['font.family'] = 'serif'
