@@ -8,7 +8,7 @@
 #
 from utils.BacktestBase import *
 import streamlit as st
-
+import plotly.graph_objects as go
 class BacktestLongOnly(BacktestBase):
         
     def run_sma_strategy(self, SMA1, SMA2):
