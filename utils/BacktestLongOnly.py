@@ -114,8 +114,8 @@ class BacktestLongOnly(BacktestBase):
                 if (self.data['momentum'].iloc[bar]) < 0 & (price_entry<self.data['price'].iloc[bar]) & (bar>ber_enrty+hold):
                     self.place_sell_order(bar, units=self.units)
                     self.position = 0  # market neutral
-                self.sell_dates.append(self.data.index[bar])  # Add this line
-                self.sell_prices.append(self.data['price'].iloc[bar]) 
+                    self.sell_dates.append(self.data.index[bar])  # Add this line
+                    self.sell_prices.append(self.data['price'].iloc[bar]) 
         self.close_out(bar)
         plt.figure(figsize=(14, 7))
         plt.plot(self.data.index, self.data['price'], label='Price', alpha=0.6)
