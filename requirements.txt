@@ -9,4 +9,4 @@ matplotlib==3.4.3
 GoogleNews==1.6.8
 python-dateutil==2.8.2
 dateparser==1.1.8
-yfinance==0.2.26
+yfinance==0.2.25
