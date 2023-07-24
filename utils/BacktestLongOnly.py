@@ -8,7 +8,7 @@
 #
 from utils.BacktestBase import *
 import streamlit as st
-
+import plotly.graph_objects as go
 class BacktestLongOnly(BacktestBase):
         
     def run_sma_strategy(self, SMA1, SMA2):
@@ -117,7 +117,6 @@ class BacktestLongOnly(BacktestBase):
                     self.sell_dates.append(self.data.index[bar])  
                     self.sell_prices.append(self.data['price'].iloc[bar]) 
         self.close_out(bar)
-        import plotly.graph_objects as go
 
         fig = go.Figure()
 
@@ -267,7 +266,7 @@ class BacktestLongOnly(BacktestBase):
 
         self.close_out(bar)
 
-
+        
 
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=self.data.index, y=self.data['price'], mode='lines', name='Price', line=dict(color='blue', width=2, dash='solid'), opacity=0.6))
