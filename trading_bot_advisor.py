@@ -274,9 +274,13 @@ if st.button("Run Backtest") and all_selected_tickers:
             st.markdown('Backtest LongOnly Strategy:')
             lobt2 = BacktestLongOnly(s, start_date, end_date, amount, 10.0, 0.01, False)
             def run_strategies():
+                st.markdown('run_sma_strategy(42, 252):')
                 lobt2.run_sma_strategy(42, 252)
+                st.markdown('run_momentum_strategy(6*30, 2*30)):')
                 lobt2.run_momentum_strategy(6*30, 2*30)
+                st.markdown('run_mean_reversion_strategy(50, 5):')
                 lobt2.run_mean_reversion_strategy(50, 5)
+                st.markdown('run_sma_improved_strategy(50, 5):')
                 lobt2.run_sma_improved_strategy(50, 5)
             
             run_strategies()
