@@ -255,9 +255,7 @@ if st.button("Run Backtest") and all_selected_tickers:
     amount = st.number_input('Amount:', min_value=100.0, value=10000.0)
     
     # Input for filtered_pairs
-    user_input_pairs = st.text_input('Enter tickers (comma separated):')
-    if user_input_pairs:
-        filtered_pairs = [f"{ticker.strip()}-USD" for ticker in user_input_pairs.split(',')]
+
         
     for s in filtered_pairs:
         try:
