@@ -109,9 +109,9 @@ class BacktestLongOnly(BacktestBase):
                     self.buy_prices.append(self.data['price'].iloc[bar]) 
                     self.position = 1  # long position
                     price_entry = self.data['price'].iloc[bar]
-                    ber_enrty = bar
+                    bar_entry = bar
             elif self.position == 1:
-                if (self.data['momentum'].iloc[bar]) < 0 & (price_entry<self.data['price'].iloc[bar]) & (bar>ber_enrty+hold):
+                if (self.data['momentum'].iloc[bar]) < 0 & (price_entry<self.data['price'].iloc[bar]) & (bar>bar_entry+hold):
                     self.place_sell_order(bar, units=self.units)
                     self.position = 0  # market neutral
                     self.sell_dates.append(self.data.index[bar])  
@@ -215,15 +215,65 @@ class BacktestLongOnly(BacktestBase):
         self.close_out(bar)
 
 
-"""if __name__ == '__main__':
-    def run_strategies():
-        lobt.run_sma_strategy(42, 252)
-        lobt.run_momentum_strategy(60)
-        lobt.run_mean_reversion_strategy(50, 5)
-    lobt = BacktestLongOnly('AAPL.O', '2010-1-1', '2019-12-31', 10000,
-                            verbose=False)
-    run_strategies()
-    # transaction costs: 10 USD fix, 1% variable
-    lobt = BacktestLongOnly('AAPL.O', '2010-1-1', '2019-12-31',
-                            10000, 10.0, 0.01, False)
-    run_strategies()"""
+    def run_enhanced_momentum_strategy(self, momentum, hold, ma_period=200, threshold=0.01):
+        """ Backtesting an enhanced momentum-based strategy.
+
+        Parameters
+        ==========
+        momentum: int
+            number of days for mean return calculation
+        hold: int
+            minimum number of days to hold after buying
+        ma_period: int
+            number of days for moving average trend confirmation
+        threshold: float
+            minimum momentum threshold to initiate a trade
+        """
+        self.buy_dates = []
+        self.sell_dates = []
+        self.buy_prices = []
+        self.sell_prices = []
+
+        msg = f'\n\nRunning enhanced momentum strategy | {momentum} days'
+        msg += f'\nfixed costs {self.ftc} | '
+        msg += f'proportional costs {self.ptc}'
+        st.markdown(msg)
+        st.markdown('=' * 55)
+
+        self.position = 0  # initial neutral position
+        self.trades = 0  # no trades yet
+        self.amount = self.initial_amount  # reset initial capital
+        self.data['momentum'] = self.data['return'].rolling(momentum).mean()
+        self.data['volatility'] = self.data['return'].rolling(momentum).std()
+        self.data['sharpe'] = self.data['momentum'] / self.data['volatility']
+        self.data['long_ma'] = self.data['price'].rolling(ma_period).mean()
+
+        for bar in range(max(ma_period, momentum), len(self.data)):
+            if self.position == 0:
+                if (self.data['momentum'].iloc[bar] > threshold) and (self.data['sharpe'].iloc[bar] > 0) and (self.data['price'].iloc[bar] > self.data['long_ma'].iloc[bar]):
+                    self.place_buy_order(bar, amount=self.amount)
+                    self.buy_dates.append(self.data.index[bar])
+                    self.buy_prices.append(self.data['price'].iloc[bar])
+                    self.position = 1  # long position
+                    price_entry = self.data['price'].iloc[bar]
+                    bar_entry = bar
+
+            elif self.position == 1:
+                if ((self.data['momentum'].iloc[bar] < 0) and (price_entry < self.data['price'].iloc[bar]) and (bar > bar_entry + hold)):
+                    self.place_sell_order(bar, units=self.units)
+                    self.position = 0  # market neutral
+                    self.sell_dates.append(self.data.index[bar])
+                    self.sell_prices.append(self.data['price'].iloc[bar])
+
+        self.close_out(bar)
+
+        # The rest of the plotting code remains unchanged
+        import plotly.graph_objects as go
+
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=self.data.index, y=self.data['price'], mode='lines', name='Price', line=dict(color='blue', width=2, dash='solid'), opacity=0.6))
+        fig.add_trace(go.Scatter(x=self.buy_dates, y=self.buy_prices, mode='markers', marker=dict(symbol='triangle-up', size=10, color='green'), name='Buy Signal'))
+        fig.add_trace(go.Scatter(x=self.sell_dates, y=self.sell_prices, mode='markers', marker=dict(symbol='triangle-down', size=10, color='red'), name='Sell Signal'))
+        fig.update_layout(title='Price and Buy/Sell Signals with Enhanced Momentum Strategy', xaxis_title='Date', yaxis_title='Price', template="plotly_white", showlegend=True)
+        st.plotly_chart(fig)
+
