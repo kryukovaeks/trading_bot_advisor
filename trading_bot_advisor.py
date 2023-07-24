@@ -223,10 +223,10 @@ import plotly.graph_objects as go
 
 # Define a list of tickers the user can choose from 
 # (You can expand this list based on the available tickers you want to offer for backtesting)
-available_tickers = ['MDT', 'OKB', 'OAS', 'KNC', 'NYM', 'XTZ', 'MIR', 'LUNA', 'RVN', 'REN', 'LSK', 'ANC', 'IOTA']
+available_tickers = ['BTC','MDT', 'OKB', 'OAS', 'KNC', 'NYM', 'XTZ', 'MIR', 'LUNA', 'RVN', 'REN', 'LSK', 'ANC', 'IOTA']
 
 # Use Streamlit's multiselect widget for the user to select tickers
-selected_tickers = st.multiselect("Select Tickers for Backtesting", available_tickers, default=available_tickers)
+selected_tickers = st.multiselect("Select Tickers for Backtesting", available_tickers, default='BTC')
 
 # Add a button to initiate backtesting
 if st.button("Run Backtest") and selected_tickers:
