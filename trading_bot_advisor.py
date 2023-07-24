@@ -262,17 +262,9 @@ if st.button("Run Backtest") and all_selected_tickers:
             bb = BacktestBase(s, start_date, end_date, amount)
             
             # Convert matplotlib figure to Plotly figure
-            fig = go.Figure(data=[go.Candlestick(
-                x=bb.data.index,
-                open=bb.data['open'],
-                high=bb.data['high'],
-                low=bb.data['low'],
-                close=bb.data['close']
-            )])
+            fig = bb.plot_data()
 
-            # Update titles and layout
-            fig.update_layout(title=s, xaxis_title='Date', yaxis_title='Price')
-            
+
             # Display the plot in Streamlit
             st.plotly_chart(fig)
 
