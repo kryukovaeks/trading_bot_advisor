@@ -278,7 +278,7 @@ if st.button("Run Backtest") and all_selected_tickers and start_date and end_dat
                 lobt2.run_momentum_strategy(6*30, 2*30)
                 lobt2.run_mean_reversion_strategy(50, 5)
                 lobt2.run_sma_improved_strategy(50, 5)
-            
+                lobt2.run_enhanced_momentum_strategy(self, 50, 5, ma_period=200, threshold=0.01)
             run_strategies()
         except Exception as e:
             st.error(f"An error occurred: {str(e)}")
