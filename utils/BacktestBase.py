@@ -126,14 +126,14 @@ class BacktestBase(object):
         ''' Print out current cash balance info.
         '''
         date, price = self.get_date_price(bar)
-        print(f'{date} | current balance {self.amount:.2f}')
+        st.text(f'{date} | current balance {self.amount:.2f}')
 
     def print_net_wealth(self, bar):
         ''' Print out current cash balance info.
         '''
         date, price = self.get_date_price(bar)
         net_wealth = self.units * price + self.amount
-        print(f'{date} | current net wealth {net_wealth:.2f}')
+        st.text(f'{date} | current net wealth {net_wealth:.2f}')
 
     def place_buy_order(self, bar, units=None, amount=None):
         ''' Place a buy order.
@@ -145,7 +145,7 @@ class BacktestBase(object):
         self.units += units
         self.trades += 1
         if self.verbose:
-            print(f'{date} | buying {units} units at {price:.2f}')
+            st.text(f'{date} | buying {units} units at {price:.2f}')
             self.print_balance(bar)
             self.print_net_wealth(bar)
 
@@ -159,7 +159,7 @@ class BacktestBase(object):
         self.units -= units
         self.trades += 1
         if self.verbose:
-            print(f'{date} | selling {units} units at {price:.2f}')
+            st.text(f'{date} | selling {units} units at {price:.2f}')
             self.print_balance(bar)
             self.print_net_wealth(bar)
 
@@ -171,14 +171,14 @@ class BacktestBase(object):
         self.units = 0
         self.trades += 1
         if self.verbose:
-            print(f'{date} | inventory {self.units} units at {price:.2f}')
-            print('=' * 55)
-        print('Final balance   [$] {:.2f}'.format(self.amount))
+            st.text(f'{date} | inventory {self.units} units at {price:.2f}')
+            st.text('=' * 55)
+        st.text('Final balance   [$] {:.2f}'.format(self.amount))
         perf = ((self.amount - self.initial_amount) /
                 self.initial_amount * 100)
-        print('Net Performance [%] {:.2f}'.format(perf))
-        print('Trades Executed [#] {:.2f}'.format(self.trades))
-        print('=' * 55)
+        st.text('Net Performance [%] {:.2f}'.format(perf))
+        st.text('Trades Executed [#] {:.2f}'.format(self.trades))
+        st.text('=' * 55)
     def print_hold(self):
         return ((self.data['price'][-1]/self.data['price'][0]-1)*100,'%')
 
