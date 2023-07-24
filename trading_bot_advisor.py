@@ -263,9 +263,6 @@ if st.button("Run Backtest") and all_selected_tickers:
             
             # Convert matplotlib figure to Plotly figure
             fig = bb.plot_data()
-
-
-            # Display the plot in Streamlit
             st.plotly_chart(fig)
 
             st.markdown('If hold:')

@@ -96,7 +96,7 @@ class BacktestBase(object):
 
         fig = go.Figure(data=[go.Scatter(x=self.data.index, y=self.data['price'])])
         fig.update_layout(title=self.symbol, xaxis_title='Date', yaxis_title='Price')
-        fig.show()
+        return fig
 
     def plot_sma(self, cols=None, sma1=20, sma2=50):
         ''' Plots the closing prices, sma1, and sma2 for symbol.
