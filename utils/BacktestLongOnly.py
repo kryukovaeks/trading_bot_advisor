@@ -117,16 +117,24 @@ class BacktestLongOnly(BacktestBase):
                     self.sell_dates.append(self.data.index.values[bar])  
                     self.sell_prices.append(self.data['price'].iloc[bar]) 
         self.close_out(bar)
-        plt.figure(figsize=(14, 7))
-        plt.plot(self.data.index.values, self.data['price'].values, label='Price', alpha=0.6)
-        plt.scatter(self.buy_dates, self.buy_prices, marker='^', color='g', alpha=1.0, label='Buy Signal')
-        plt.scatter(self.sell_dates, self.sell_prices, marker='v', color='r', alpha=1.0, label='Sell Signal')
-        plt.title('Price and Buy/Sell Signals')
-        plt.xlabel('Date')
-        plt.ylabel('Price')
-        plt.legend()
-        plt.grid(True)
-        st.pyplot(plt)
+        fig = go.Figure()
+
+        # Plotting the Price data
+        fig.add_trace(go.Scatter(x=self.data.index, y=self.data['price'],
+                        mode='lines',
+                        name='Price'))
+
+        # Plotting the sell points
+        fig.add_trace(go.Scatter(x=self.sell_dates, y=self.sell_prices,
+                        mode='markers',
+                        marker=dict(symbol='triangle-down', size=10, color='red'),
+                        name='Sell Points'))
+
+        fig.update_layout(title='Sell Points Visualization with Plotly',
+                        xaxis_title='Date',
+                        yaxis_title='Price')
+        
+        st.plotly_chart(fig)
     def run_mean_reversion_strategy_Richmond(self,SMA=200):
         #https://www.richmondquant.com/news/2018/11/30/using-mean-reversion-techniques-to-profit-in-volatile-markets
         '''Backtesting a run_mean_reversion_strategy_Richmond'''
