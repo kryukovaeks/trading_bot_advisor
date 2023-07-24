@@ -250,8 +250,8 @@ if st.button("Run Backtest") and all_selected_tickers:
 
     # Suppress warnings
     warnings.filterwarnings('ignore')
-    start_date = st.date_input('Start Date', False)
-    end_date = st.date_input('End Date', False)
+    start_date = st.date_input('Start Date', dt.date(2020, 1, 1))
+    end_date = st.date_input('End Date', dt.date.today())
     amount = st.number_input('Amount:', min_value=100.0, value=10000.0)
     
     # Input for filtered_pairs
