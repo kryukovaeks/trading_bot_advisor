@@ -118,7 +118,7 @@ class BacktestLongOnly(BacktestBase):
                     self.sell_prices.append(self.data['price'].iloc[bar]) 
         self.close_out(bar)
         plt.figure(figsize=(14, 7))
-        plt.plot(self.data.index, self.data['price'], label='Price', alpha=0.6)
+        plt.plot(self.data.index, self.data['price'].values, label='Price', alpha=0.6)
         plt.scatter(self.buy_dates, self.buy_prices, marker='^', color='g', alpha=1.0, label='Buy Signal')
         plt.scatter(self.sell_dates, self.sell_prices, marker='v', color='r', alpha=1.0, label='Sell Signal')
         plt.title('Price and Buy/Sell Signals')
