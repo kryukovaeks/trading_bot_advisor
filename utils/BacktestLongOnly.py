@@ -150,8 +150,7 @@ class BacktestLongOnly(BacktestBase):
         # Show the figure in Streamlit
         st.plotly_chart(fig)
 
-# Call the function after running your strategy
-plot_signals_with_plotly(self)
+
 
     def run_mean_reversion_strategy_Richmond(self,SMA=200):
         #https://www.richmondquant.com/news/2018/11/30/using-mean-reversion-techniques-to-profit-in-volatile-markets
