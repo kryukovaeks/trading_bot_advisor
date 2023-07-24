@@ -8,7 +8,7 @@
 #
 from utils.BacktestBase import *
 import streamlit as st
-import plotly.graph_objects as go
+
 class BacktestLongOnly(BacktestBase):
         
     def run_sma_strategy(self, SMA1, SMA2):
@@ -117,24 +117,42 @@ class BacktestLongOnly(BacktestBase):
                     self.sell_dates.append(self.data.index.values[bar])  
                     self.sell_prices.append(self.data['price'].iloc[bar]) 
         self.close_out(bar)
+        import plotly.graph_objects as go
+
         fig = go.Figure()
 
         # Plotting the Price data
         fig.add_trace(go.Scatter(x=self.data.index, y=self.data['price'],
-                        mode='lines',
-                        name='Price'))
+                                mode='lines',
+                                name='Price', 
+                                line=dict(color='blue', width=2, dash='solid'),
+                                opacity=0.6))
+
+        # Plotting the buy points
+        fig.add_trace(go.Scatter(x=self.buy_dates, y=self.buy_prices,
+                                mode='markers',
+                                marker=dict(symbol='triangle-up', size=10, color='green'),
+                                name='Buy Signal'))
 
         # Plotting the sell points
         fig.add_trace(go.Scatter(x=self.sell_dates, y=self.sell_prices,
-                        mode='markers',
-                        marker=dict(symbol='triangle-down', size=10, color='red'),
-                        name='Sell Points'))
+                                mode='markers',
+                                marker=dict(symbol='triangle-down', size=10, color='red'),
+                                name='Sell Signal'))
 
-        fig.update_layout(title='Sell Points Visualization with Plotly',
+        # Update layout to match the given matplotlib's appearance
+        fig.update_layout(title='Price and Buy/Sell Signals with Plotly',
                         xaxis_title='Date',
-                        yaxis_title='Price')
-        
+                        yaxis_title='Price',
+                        template="plotly_white",
+                        showlegend=True)
+
+        # Show the figure in Streamlit
         st.plotly_chart(fig)
+
+# Call the function after running your strategy
+plot_signals_with_plotly(self)
+
     def run_mean_reversion_strategy_Richmond(self,SMA=200):
         #https://www.richmondquant.com/news/2018/11/30/using-mean-reversion-techniques-to-profit-in-volatile-markets
         '''Backtesting a run_mean_reversion_strategy_Richmond'''
