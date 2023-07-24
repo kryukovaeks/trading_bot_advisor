@@ -212,3 +212,74 @@ if cryptos_input:
     st.markdown(f"> {textwrap.fill(str(res), width=50)}")
 
 
+# Additional imports for backtesting
+import warnings
+from utils.BacktestLongOnly import *
+from pylab import mpl
+import plotly.graph_objects as go
+
+
+
+
+# Define a list of tickers the user can choose from 
+# (You can expand this list based on the available tickers you want to offer for backtesting)
+available_tickers = ['MDT', 'OKB', 'OAS', 'KNC', 'NYM', 'XTZ', 'MIR', 'LUNA', 'RVN', 'REN', 'LSK', 'ANC', 'IOTA']
+
+# Use Streamlit's multiselect widget for the user to select tickers
+selected_tickers = st.multiselect("Select Tickers for Backtesting", available_tickers, default=available_tickers)
+
+# Add a button to initiate backtesting
+if st.button("Run Backtest") and selected_tickers:
+    # Convert the tickers to the format used in the backtesting
+    filtered_pairs = [ticker + '-USD' for ticker in selected_tickers]
+
+    # Display header for backtesting section
+    st.markdown("## Backtesting Results")
+
+    # Suppress warnings
+    warnings.filterwarnings('ignore')
+    start_date = st.date_input('Start Date', False)
+    end_date = st.date_input('End Date', False)
+    amount = st.number_input('Amount:', min_value=100.0, value=10000.0)
+    
+    # Input for filtered_pairs
+    user_input_pairs = st.text_input('Enter tickers (comma separated):')
+    if user_input_pairs:
+        filtered_pairs = [f"{ticker.strip()}-USD" for ticker in user_input_pairs.split(',')]
+        
+    for s in filtered_pairs:
+        try:
+            bb = BacktestBase(s, start_date, end_date, amount)
+            
+            # Convert matplotlib figure to Plotly figure
+            fig = go.Figure(data=[go.Candlestick(
+                x=bb.data.index,
+                open=bb.data['open'],
+                high=bb.data['high'],
+                low=bb.data['low'],
+                close=bb.data['close']
+            )])
+
+            # Update titles and layout
+            fig.update_layout(title=s, xaxis_title='Date', yaxis_title='Price')
+            
+            # Display the plot in Streamlit
+            st.plotly_chart(fig)
+
+            st.markdown('If hold:')
+            st.markdown(bb.print_hold())
+
+            # For SMA strategy plotting, adjust the same way by creating a new Plotly figure and adding traces
+            # ...
+            st.markdown('Backtest LongOnly Strategy:')
+            lobt2 = BacktestLongOnly(s, start_date, end_date, amount, 10.0, 0.01, False)
+            def run_strategies():
+                lobt2.run_sma_strategy(42, 252)
+                lobt2.run_momentum_strategy(6*30, 2*30)
+                lobt2.run_mean_reversion_strategy(50, 5)
+                lobt2.run_sma_improved_strategy(50, 5)
+            
+            run_strategies()
+        except Exception as e:
+            st.error(f"An error occurred: {str(e)}")
+
