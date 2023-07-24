@@ -22,8 +22,8 @@ class BacktestLongOnly(BacktestBase):
         msg = f'\n\nRunning SMA strategy | SMA1={SMA1} & SMA2={SMA2}'
         msg += f'\nfixed costs {self.ftc} | '
         msg += f'proportional costs {self.ptc}'
-        print(msg)
-        print('=' * 55)
+        st.markdown(msg)
+        st.markdown('=' * 55)
         self.position = 0  # initial neutral position
         self.trades = 0  # no trades yet
         self.amount = self.initial_amount  # reset initial capital
@@ -34,6 +34,7 @@ class BacktestLongOnly(BacktestBase):
             if self.position == 0:
                 if self.data['SMA1'].iloc[bar] > self.data['SMA2'].iloc[bar]:
                     self.place_buy_order(bar, amount=self.amount)
+
                     self.position = 1  # long position
                     price_entry = self.data['price'].iloc[bar]
                     
@@ -53,8 +54,8 @@ class BacktestLongOnly(BacktestBase):
         msg = f'\n\nRunning SMA strategy | SMA1={SMA1} & SMA2={SMA2}'
         msg += f'\nfixed costs {self.ftc} | '
         msg += f'proportional costs {self.ptc}'
-        print(msg)
-        print('=' * 55)
+        st.markdown(msg)
+        st.markdown('=' * 55)
         self.position = 0  # initial neutral position
         self.trades = 0  # no trades yet
         self.amount = self.initial_amount  # reset initial capital
@@ -86,11 +87,16 @@ class BacktestLongOnly(BacktestBase):
         momentum: int
             number of days for mean return calculation
         '''
+        self.buy_dates = []
+        self.sell_dates = []
+        self.buy_prices = []
+        self.sell_prices = []
+
         msg = f'\n\nRunning momentum strategy | {momentum} days'
         msg += f'\nfixed costs {self.ftc} | '
         msg += f'proportional costs {self.ptc}'
-        print(msg)
-        print('=' * 55)
+        st.markdown(msg)
+        st.markdown('=' * 55)
         self.position = 0  # initial neutral position
         self.trades = 0  # no trades yet
         self.amount = self.initial_amount  # reset initial capital
@@ -99,6 +105,8 @@ class BacktestLongOnly(BacktestBase):
             if self.position == 0:
                 if self.data['momentum'].iloc[bar] > 0:
                     self.place_buy_order(bar, amount=self.amount)
+                    self.buy_dates.append(self.data.index[bar])  
+                    self.buy_prices.append(self.data['price'].iloc[bar]) 
                     self.position = 1  # long position
                     price_entry = self.data['price'].iloc[bar]
                     ber_enrty = bar
@@ -106,12 +114,24 @@ class BacktestLongOnly(BacktestBase):
                 if (self.data['momentum'].iloc[bar]) < 0 & (price_entry<self.data['price'].iloc[bar]) & (bar>ber_enrty+hold):
                     self.place_sell_order(bar, units=self.units)
                     self.position = 0  # market neutral
+                self.sell_dates.append(self.data.index[bar])  # Add this line
+                self.sell_prices.append(self.data['price'].iloc[bar]) 
         self.close_out(bar)
+        plt.figure(figsize=(14, 7))
+        plt.plot(self.data.index, self.data['price'], label='Price', alpha=0.6)
+        plt.scatter(self.buy_dates, self.buy_prices, marker='^', color='g', alpha=1.0, label='Buy Signal')
+        plt.scatter(self.sell_dates, self.sell_prices, marker='v', color='r', alpha=1.0, label='Sell Signal')
+        plt.title('Price and Buy/Sell Signals')
+        plt.xlabel('Date')
+        plt.ylabel('Price')
+        plt.legend()
+        plt.grid(True)
+        st.pyplot(plt)
     def run_mean_reversion_strategy_Richmond(self,SMA=200):
         #https://www.richmondquant.com/news/2018/11/30/using-mean-reversion-techniques-to-profit-in-volatile-markets
         '''Backtesting a run_mean_reversion_strategy_Richmond'''
-        print("\nRunning run_mean_reversion_strategy_Richmond")
-        print("=" * 55)
+        st.markdown("\nRunning run_mean_reversion_strategy_Richmond")
+        st.markdown("=" * 55)
         self.position = 0  # initial neutral position
         self.trades = 0  # no trades yet
         self.amount = self.initial_amount  # reset initial capital
@@ -146,8 +166,8 @@ class BacktestLongOnly(BacktestBase):
         msg += f'SMA={SMA} & thr={threshold}'
         msg += f'\nfixed costs {self.ftc} | '
         msg += f'proportional costs {self.ptc}'
-        print(msg)
-        print('=' * 55)
+        st.markdown(msg)
+        st.markdown('=' * 55)
         self.position = 0
         self.trades = 0
         self.amount = self.initial_amount
