@@ -143,74 +143,75 @@ if cryptos_input:
 
 
 
+    try:
+        # AI prompt
+        base_prompt = f"""
+        You are in control of my crypto trading profile. You should take into consideration the factors you have to determine the best trade. Here is the info:
 
-    # AI prompt
-    base_prompt = f"""
-    You are in control of my crypto trading profile. You should take into consideration the factors you have to determine the best trade. Here is the info:
+        You can execute these commands:
 
-    You can execute these commands:
+        1. buy_crypto_price(symbol, amount)
+        2. buy_crypto_limit(symbol, amount, limit)
+        3. sell_crypto_price(symbol, amount)
+        4. sell_crypto_limit(symbol, amount, limit)
+        5. do_nothing()
+        You have to provide amount.
+        Use this when you don't see any necessary changes.
 
-    1. buy_crypto_price(symbol, amount)
-    2. buy_crypto_limit(symbol, amount, limit)
-    3. sell_crypto_price(symbol, amount)
-    4. sell_crypto_limit(symbol, amount, limit)
-    5. do_nothing()
-    You have to provide amount.
-    Use this when you don't see any necessary changes.
+        You also have access to this data:
 
-    You also have access to this data:
+        1. Historical data
+        2. News Headlines
 
-    1. Historical data
-    2. News Headlines
+        The current date and time is {dt.datetime.today()}
 
-    The current date and time is {dt.datetime.today()}
+        You are called once every 30 minutes, keep this in mind.
 
-    You are called once every 30 minutes, keep this in mind.
+        The only cryptos you can trade are {', '.join(cryptos)}.
 
-    The only cryptos you can trade are {', '.join(cryptos)}.
+        Here are the data sources:
 
-    Here are the data sources:
-
-    """
-
-    info_str = f"Historical statistics for {days_input} days: {crypto_data}\n News: {news_data[['title','crypto']].drop_duplicates()}"
-    prompt = base_prompt + "\n\n" + info_str
-    user_prompt = """
-    What should we do to make the most amount of profit based on the info? Here are your options for a response.
-
-    1. buy_crypto_price(symbol, amount) This will buy the specified amount of the specified cryptocurrency.
-    2. buy_crypto_limit(symbol, amount, limit) This will set a limit order to buy the specified amount of the specified cryptocurrency if it reaches the specified limit.
-    3. sell_crypto_price(symbol, amount) This will sell the specified amount of the specified cryptocurrency.
-    4. sell_crypto_limit(symbol, amount, limit) This will set a limit order to sell the specified amount of the specified cryptocurrency if it reaches the specified limit.
-    5. do_nothing() Use this when you don't see any necessary changes.
-    
-    Choose one (firstly write the execution command) and explain
-    CRITICAL: RESPOND IN ONLY THE ABOVE FORMAT. EXAMPLE: buy_crypto_price("ETH", 100). 
-    ALSO IN THE AMOUNT FIELD, USE THE UNIT SYSTEM OF DOLLARS. ASSUME WE HAVE A BUDGET of UP TO ${max_budget} WORTH OF dollar PER TRADE for 24 hours.
-
-    !give execution for every crypto at the beginning
-    !do not forget to explain
         """
 
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=[
-            {"role": "system", "content": prompt},
-            {"role": "user", "content": user_prompt}
-        ],
-        temperature = 0.2,
-    )
+        info_str = f"Historical statistics for {days_input} days: {crypto_data}\n News: {news_data[['title','crypto']].drop_duplicates()}"
+        prompt = base_prompt + "\n\n" + info_str
+        user_prompt = """
+        What should we do to make the most amount of profit based on the info? Here are your options for a response.
 
-    res = response.choices[0].message["content"]
-    res = res.replace("\\", "")
-    # Create a horizontal separator for visual clarity
-    st.markdown("---")
-    
-    
-    st.markdown("### ChatGPT Advice:")
-    # Use a markdown block to display the advice
-    st.markdown(f"> {textwrap.fill(str(res), width=50)}")
+        1. buy_crypto_price(symbol, amount) This will buy the specified amount of the specified cryptocurrency.
+        2. buy_crypto_limit(symbol, amount, limit) This will set a limit order to buy the specified amount of the specified cryptocurrency if it reaches the specified limit.
+        3. sell_crypto_price(symbol, amount) This will sell the specified amount of the specified cryptocurrency.
+        4. sell_crypto_limit(symbol, amount, limit) This will set a limit order to sell the specified amount of the specified cryptocurrency if it reaches the specified limit.
+        5. do_nothing() Use this when you don't see any necessary changes.
+        
+        Choose one (firstly write the execution command) and explain
+        CRITICAL: RESPOND IN ONLY THE ABOVE FORMAT. EXAMPLE: buy_crypto_price("ETH", 100). 
+        ALSO IN THE AMOUNT FIELD, USE THE UNIT SYSTEM OF DOLLARS. ASSUME WE HAVE A BUDGET of UP TO ${max_budget} WORTH OF dollar PER TRADE for 24 hours.
 
+        !give execution for every crypto at the beginning
+        !do not forget to explain
+            """
+
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": prompt},
+                {"role": "user", "content": user_prompt}
+            ],
+            temperature = 0.2,
+        )
+
+        res = response.choices[0].message["content"]
+        res = res.replace("\\", "")
+        # Create a horizontal separator for visual clarity
+        st.markdown("---")
+        
+        
+        st.markdown("### ChatGPT Advice:")
+        # Use a markdown block to display the advice
+        st.markdown(f"> {textwrap.fill(str(res), width=50)}")
+except Exception as e:
+        st.error(e)
 
 # Additional imports for backtesting
 import warnings
