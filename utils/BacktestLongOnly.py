@@ -105,7 +105,7 @@ class BacktestLongOnly(BacktestBase):
             if self.position == 0:
                 if self.data['momentum'].iloc[bar] > 0:
                     self.place_buy_order(bar, amount=self.amount)
-                    self.buy_dates.append(bar)  
+                    self.buy_dates.append(self.data.index[bar])  
                     self.buy_prices.append(self.data['price'].iloc[bar]) 
                     self.position = 1  # long position
                     price_entry = self.data['price'].iloc[bar]
@@ -114,7 +114,7 @@ class BacktestLongOnly(BacktestBase):
                 if (self.data['momentum'].iloc[bar]) < 0 & (price_entry<self.data['price'].iloc[bar]) & (bar>ber_enrty+hold):
                     self.place_sell_order(bar, units=self.units)
                     self.position = 0  # market neutral
-                    self.sell_dates.append(bar)  
+                    self.sell_dates.append(self.data.index[bar])  
                     self.sell_prices.append(self.data['price'].iloc[bar]) 
         self.close_out(bar)
         import plotly.graph_objects as go
