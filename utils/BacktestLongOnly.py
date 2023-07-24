@@ -121,17 +121,12 @@ class BacktestLongOnly(BacktestBase):
 
         fig = go.Figure()
 
-        # Plotting the Price data
-        fig.add_trace(go.Scatter(x=self.data.index, y=self.data['price'],
-                                mode='lines',
-                                name='Price', 
-                                line=dict(color='blue', width=2, dash='solid'),
-                                opacity=0.6))
+
 
         # Plotting the buy points
         fig.add_trace(go.Scatter(x=self.buy_dates, y=self.buy_prices,
                                 mode='markers',
-                                marker=dict(symbol=5, size=10, color='green'),
+                                marker=dict(symbol='triangle-up', size=10, color='green'),
                                 name='Buy Signal'))
 
         # Plotting the sell points
