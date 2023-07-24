@@ -267,8 +267,7 @@ class BacktestLongOnly(BacktestBase):
 
         self.close_out(bar)
 
-        # The rest of the plotting code remains unchanged
-        import plotly.graph_objects as go
+
 
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=self.data.index, y=self.data['price'], mode='lines', name='Price', line=dict(color='blue', width=2, dash='solid'), opacity=0.6))
