@@ -210,8 +210,8 @@ if cryptos_input:
         st.markdown("### ChatGPT Advice:")
         # Use a markdown block to display the advice
         st.markdown(f"> {textwrap.fill(str(res), width=50)}")
-except Exception as e:
-        st.error(e)
+    except Exception as e:
+            st.error(e)
 
 # Additional imports for backtesting
 import warnings
