@@ -141,7 +141,7 @@ class BacktestLongOnly(BacktestBase):
                                 name='Sell Signal'))
 
         # Update layout to match the given matplotlib's appearance
-        fig.update_layout(title='Price and Buy/Sell Signals with Plotly',
+        fig.update_layout(title='Price and Buy/Sell Signals with Momentum Strategy',
                         xaxis_title='Date',
                         yaxis_title='Price',
                         template="plotly_white",
