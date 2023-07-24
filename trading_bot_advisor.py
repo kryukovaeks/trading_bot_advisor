@@ -243,7 +243,7 @@ all_selected_tickers = list(set(selected_tickers_from_dropdown + typed_tickers))
 # Add a button to initiate backtesting
 if st.button("Run Backtest") and all_selected_tickers:
     # Convert the tickers to the format used in the backtesting
-    filtered_pairs = [ticker + '-USD' for ticker in selected_tickers]
+    filtered_pairs = [ticker + '-USD' for ticker in all_selected_tickers]
 
     # Display header for backtesting section
     st.markdown("## Backtesting Results")
