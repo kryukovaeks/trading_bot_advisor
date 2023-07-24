@@ -226,10 +226,23 @@ import plotly.graph_objects as go
 available_tickers = ['BTC','MDT', 'OKB', 'OAS', 'KNC', 'NYM', 'XTZ', 'MIR', 'LUNA', 'RVN', 'REN', 'LSK', 'ANC', 'IOTA']
 
 # Use Streamlit's multiselect widget for the user to select tickers
-selected_tickers = st.multiselect("Select Tickers for Backtesting", available_tickers, default='BTC')
+available_tickers = st.multiselect("Select Tickers for Backtesting", available_tickers, default='BTC')
+
+# 1. Dropdown selection
+selected_tickers_from_dropdown = st.multiselect("Select Tickers for Backtesting", available_tickers)
+
+# 2. Text input for custom tickers
+typed_tickers = st.text_input("Or type your own tickers (comma separated)").split(',')
+
+# Clean up the typed tickers, removing extra spaces and converting to uppercase
+typed_tickers = [ticker.strip().upper() for ticker in typed_tickers if ticker]
+
+# 3. Combine
+all_selected_tickers = list(set(selected_tickers_from_dropdown + typed_tickers))
+
 
 # Add a button to initiate backtesting
-if st.button("Run Backtest") and selected_tickers:
+if st.button("Run Backtest") and all_selected_tickers:
     # Convert the tickers to the format used in the backtesting
     filtered_pairs = [ticker + '-USD' for ticker in selected_tickers]
 
