@@ -247,7 +247,7 @@ end_date = st.date_input('End Date', dt.date.today())
 amount = st.number_input('Amount:', min_value=100.0, value=10000.0)
 ftc = st.number_input('Fixed transaction costs:', value=1)
 ptc = st.number_input('Proportional transaction costs:', value=0.01)
-lags = st.number_input('Lags for regression:', value=7)
+#lags = st.number_input('Lags for regression:', value=7)
 # Add a button to initiate backtesting
 if st.button("Run Backtest") and all_selected_tickers and start_date and end_date and amount:
     # Convert the tickers to the format used in the backtesting

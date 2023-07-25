@@ -342,4 +342,10 @@ class BacktestLongOnly(BacktestBase):
                     self.place_sell_order(bar, units=self.units)
                     self.position = 0
                     
-        self.close_out(bar)
+        self.close_out(bar)       
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=self.data.index, y=self.data['price'], mode='lines', name='Price', line=dict(color='blue', width=2, dash='solid'), opacity=0.6))
+        fig.add_trace(go.Scatter(x=self.buy_dates, y=self.buy_prices, mode='markers', marker=dict(symbol='triangle-up', size=10, color='green'), name='Buy Signal'))
+        fig.add_trace(go.Scatter(x=self.sell_dates, y=self.sell_prices, mode='markers', marker=dict(symbol='triangle-down', size=10, color='red'), name='Sell Signal'))
+        fig.update_layout(title=f'Price and Buy/Sell Signals with {reg_type.capitalize()} Regression Strategy', xaxis_title='Date', yaxis_title='Price', template="plotly_white", showlegend=True)
+        st.plotly_chart(fig)
