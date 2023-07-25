@@ -277,7 +277,7 @@ class BacktestLongOnly(BacktestBase):
         fig.add_trace(go.Scatter(x=self.sell_dates, y=self.sell_prices, mode='markers', marker=dict(symbol='triangle-down', size=10, color='red'), name='Sell Signal'))
         fig.update_layout(title='Price and Buy/Sell Signals with Enhanced Momentum Strategy', xaxis_title='Date', yaxis_title='Price', template="plotly_white", showlegend=True)
         st.plotly_chart(fig)
-    def run_regression_strategy(self, window=50, reg_type='linear'):
+    def run_regression_strategy(self, window=50, reg_type='linear', gain_threshold=0.02):
         ''' Backtesting a regression-based strategy.
 
         Parameters
@@ -303,6 +303,7 @@ class BacktestLongOnly(BacktestBase):
         self.amount = self.initial_amount  # reset initial capital
 
         for bar in range(window, len(self.data)):
+            current_price = self.data['price'].iloc[bar]
             train_data = self.data['price'].iloc[bar-window:bar].values.reshape(-1, 1)
             scaler = StandardScaler()
 
@@ -398,17 +399,23 @@ class BacktestLongOnly(BacktestBase):
 
                 last_known_price = train_data[-1]
 
+                
+
                 if self.position == 0 and predicted_price > last_known_price:  # Buy signal
                     self.place_buy_order(bar, amount=self.amount)
                     self.position = 1
                     self.buy_dates.append(self.data.index[bar])
                     self.buy_prices.append(self.data['price'].iloc[bar])
+                    purchase_price = current_price 
                     
-                elif self.position == 1 and predicted_price <= last_known_price:  # Sell signal
-                    self.place_sell_order(bar, units=self.units)
-                    self.position = 0
-                    self.sell_dates.append(self.data.index[bar])
-                    self.sell_prices.append(self.data['price'].iloc[bar])
+                elif self.position == 1:
+                    percentage_gain = (current_price - purchase_price) / purchase_price
+                    if unrealized_gain >= gain_threshold :
+                        # Sell when either we've reached the desired gain or the predicted price is not higher
+                        self.place_sell_order(bar, units=self.units)
+                        self.position = 0
+                        self.sell_dates.append(self.data.index[bar])
+                        self.sell_prices.append(current_price)
         self.close_out(bar)
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=self.data.index, y=self.data['price'], mode='lines', name='Price', line=dict(color='blue', width=2, dash='solid'), opacity=0.6))
