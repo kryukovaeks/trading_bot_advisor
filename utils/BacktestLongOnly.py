@@ -296,7 +296,12 @@ class BacktestLongOnly(BacktestBase):
         msg += f'\nfixed costs {self.ftc} | '
         msg += f'proportional costs {self.ptc}'
         st.markdown(msg)
-        st.markdown('=' * 55)
+        st.markdown('=' * 55)        
+        
+        self.buy_dates = []
+        self.sell_dates = []
+        self.buy_prices = []
+        self.sell_prices = []
         
         self.position = 0  # initial neutral position
         self.trades = 0  # no trades yet
@@ -316,9 +321,13 @@ class BacktestLongOnly(BacktestBase):
                 if self.position == 0 and slope > 0:  # Buy signal
                     self.place_buy_order(bar, amount=self.amount)
                     self.position = 1
+                    self.buy_dates.append(self.data.index[bar])
+                    self.buy_prices.append(self.data['price'].iloc[bar])
                 elif self.position == 1 and slope <= 0:  # Sell signal
                     self.place_sell_order(bar, units=self.units)
                     self.position = 0
+                    self.sell_dates.append(self.data.index[bar])
+                    self.sell_prices.append(self.data['price'].iloc[bar])
             elif reg_type == 'logistic':
                 y = (train_data.pct_change().dropna() > 0).astype(int).values
                 model = LogisticRegression()
@@ -327,9 +336,13 @@ class BacktestLongOnly(BacktestBase):
                 if self.position == 0 and proba > 0.5:  # Buy signal
                     self.place_buy_order(bar, amount=self.amount)
                     self.position = 1
+                    self.buy_dates.append(self.data.index[bar])
+                    self.buy_prices.append(self.data['price'].iloc[bar])
                 elif self.position == 1 and proba <= 0.5:  # Sell signal
                     self.place_sell_order(bar, units=self.units)
                     self.position = 0
+                    self.sell_dates.append(self.data.index[bar])
+                    self.sell_prices.append(self.data['price'].iloc[bar])
             elif reg_type == 'random_forest':
                 y = (train_data.pct_change().dropna() > 0).astype(int).values
                 model = RandomForestClassifier()
@@ -338,9 +351,13 @@ class BacktestLongOnly(BacktestBase):
                 if self.position == 0 and prediction == 1:  # Buy signal
                     self.place_buy_order(bar, amount=self.amount)
                     self.position = 1
+                    self.buy_dates.append(self.data.index[bar])
+                    self.buy_prices.append(self.data['price'].iloc[bar])
                 elif self.position == 1 and prediction == 0:  # Sell signal
                     self.place_sell_order(bar, units=self.units)
                     self.position = 0
+                    self.sell_dates.append(self.data.index[bar])
+                    self.sell_prices.append(self.data['price'].iloc[bar])
                     
         self.close_out(bar)       
         fig = go.Figure()
