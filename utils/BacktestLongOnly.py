@@ -308,22 +308,29 @@ class BacktestLongOnly(BacktestBase):
         self.amount = self.initial_amount  # reset initial capital
         
         for bar in range(window, len(self.data)):
-            train_data = self.data['price'].iloc[bar-window:bar]
+            train_data = self.data['price'].iloc[bar-window:bar].values.reshape(-1, 1)
             scaler = StandardScaler()
-            X = scaler.fit_transform(np.arange(window).reshape(-1, 1))
-            y = None
+            X_train = np.array([train_data[i: i + window].flatten() for i in range(len(train_data) - window)])
+            y_train = train_data[window:]
+            
+            # Scale the data
+            X_train_scaled = scaler.fit_transform(X_train)
             
             if reg_type == 'linear':
                 y = train_data.values
-                model = LinearRegression()
-                model.fit(X, y)
-                slope = model.coef_[0]
-                if self.position == 0 and slope > 0:  # Buy signal
+                model.fit(X_train_scaled, y_train)
+                slope = model.coef_[0][0] # Adjusted for the nested array shape
+                prediction = model.predict(scaler.transform(train_data[-window:].reshape(1, -1)))
+                next_price = prediction[0][0]
+                last_known_price = train_data[-1][0]
+                
+                if self.position == 0 and next_price > last_known_price:  # Buy signal if predicted price is higher
                     self.place_buy_order(bar, amount=self.amount)
                     self.position = 1
                     self.buy_dates.append(self.data.index[bar])
                     self.buy_prices.append(self.data['price'].iloc[bar])
-                elif self.position == 1 and slope <= 0:  # Sell signal
+                    
+                elif self.position == 1 and next_price <= last_known_price:  # Sell signal if predicted price is not higher
                     self.place_sell_order(bar, units=self.units)
                     self.position = 0
                     self.sell_dates.append(self.data.index[bar])
