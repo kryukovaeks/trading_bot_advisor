@@ -342,4 +342,4 @@ class BacktestLongOnly(BacktestBase):
                     self.place_sell_order(bar, units=self.units)
                     self.position = 0
                     
-            self.close_out(bar)
+        self.close_out(bar)
