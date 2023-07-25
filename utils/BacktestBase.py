@@ -57,7 +57,7 @@ class BacktestBase(object):
     def __init__(self, symbol, 
                  start, end, 
                  amount,
-                 ftc=0.0, ptc=0.0, verbose=True):
+                 ftc=0.0, ptc=0.0, verbose=False):
         self.symbol = symbol
         self.start = start
         self.end = end
