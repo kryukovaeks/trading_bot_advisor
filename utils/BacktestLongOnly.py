@@ -9,6 +9,9 @@
 from utils.BacktestBase import *
 import streamlit as st
 import plotly.graph_objects as go
+from sklearn.linear_model import LinearRegression, LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.preprocessing import StandardScaler
 class BacktestLongOnly(BacktestBase):
         
     def run_sma_strategy(self, SMA1, SMA2):
@@ -276,9 +279,7 @@ class BacktestLongOnly(BacktestBase):
         st.plotly_chart(fig)
 
 
-    from sklearn.linear_model import LinearRegression, LogisticRegression
-    from sklearn.ensemble import RandomForestClassifier
-    from sklearn.preprocessing import StandardScaler
+
 
 
     def run_regression_strategy(self, window=50, reg_type='linear'):
