@@ -14,7 +14,7 @@ from plotly.subplots import make_subplots
 import plotly.graph_objects as go
 import requests
 import time
-
+from utils.regression import ScikitVectorBacktester
 st.set_page_config(layout='wide') 
 
 
@@ -245,6 +245,9 @@ warnings.filterwarnings('ignore')
 start_date = st.date_input('Start Date', dt.date(2020, 1, 1))
 end_date = st.date_input('End Date', dt.date.today())
 amount = st.number_input('Amount:', min_value=100.0, value=10000.0)
+ftc = st.number_input('Fixed transaction costs:', value=1)
+ptc = st.number_input('Proportional transaction costs:', value=0.01)
+lags = st.number_input('Lags for regression:', value=7)
 # Add a button to initiate backtesting
 if st.button("Run Backtest") and all_selected_tickers and start_date and end_date and amount:
     # Convert the tickers to the format used in the backtesting
@@ -272,13 +275,17 @@ if st.button("Run Backtest") and all_selected_tickers and start_date and end_dat
             # For SMA strategy plotting, adjust the same way by creating a new Plotly figure and adding traces
             # ...
             st.markdown('Backtest LongOnly Strategy:')
-            lobt2 = BacktestLongOnly(s, start_date, end_date, amount, 0, 0, verbose = False)
+            lobt2 = BacktestLongOnly(s, start_date, end_date, amount, ftx, ptc, verbose = False)
+            scibt = ScikitVectorBacktester(s, amount, ptc, 'linear regression',  lags=lags)
             def run_strategies():
                 lobt2.run_sma_strategy(42, 252)
                 lobt2.run_momentum_strategy(6*30, 2*30)
                 lobt2.run_mean_reversion_strategy(50, 5)
                 lobt2.run_sma_improved_strategy(50, 5)
                 lobt2.run_enhanced_momentum_strategy( 50, 5, ma_period=200, threshold=0.01)
+                df = scibt.select_data()
+                scibt.run_strategy(df.index.min(), df.index[int(len(df)*0.8)],df.index[int(len(df)*0.8)+1],
+                              df.index.max())
             run_strategies()
         except Exception as e:
             st.error(f"An error occurred: {str(e)}")

@@ -250,7 +250,7 @@ class ScikitVectorBacktester(object):
         if self.std is True:
             self.mu, self.std = self.data_subset.mean(), self.data_subset.std()
             self.data_subset = (self.data_subset - self.mu) / self.std
-        print(self.feature_columns)
+        st.write(self.feature_columns)
         self.model.fit(self.data_subset[self.feature_columns],
                        self.y)
 
@@ -271,9 +271,9 @@ class ScikitVectorBacktester(object):
         if self.std is True:
             self.data_subset = self.data_subset * self.std + self.mu
         self.data_subset['prediction'] = np.where(prediction>0,1,-1)
-        print('mean_of_going up: ',self.data_subset[np.sign(self.data_subset['returns'])==1].shape[0]/self.data_subset.shape[0])
-        print(self.data_subset[['prediction','returns']])
-        print(accuracy_score(self.data_subset['prediction'], self.y))
+        st.write('mean_of_going up: ',self.data_subset[np.sign(self.data_subset['returns'])==1].shape[0]/self.data_subset.shape[0])
+        st.write(self.data_subset[['prediction','returns']])
+        st.write(accuracy_score(self.data_subset['prediction'], self.y))
         self.data_subset['strategy'] = (self.data_subset['prediction'] *
                                         self.data_subset['returns'])
         # determine when a trade takes place
@@ -298,10 +298,9 @@ class ScikitVectorBacktester(object):
         compared to the symbol.
         '''
         if self.results is None:
-            print('No results to plot yet. Run a strategy.')
+            st.write('No results to plot yet. Run a strategy.')
         title = '%s | TC = %.4f' % (self.symbol, self.tc)
-        self.results[['creturns', 'cstrategy']].plot(title=title,
-                                                     figsize=(10, 6))
+        st.line_chart(self.results[['creturns', 'cstrategy']], title=title)  
 
 
 
