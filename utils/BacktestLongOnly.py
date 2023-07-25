@@ -319,7 +319,7 @@ class BacktestLongOnly(BacktestBase):
                     self.place_sell_order(bar, units=self.units)
                     self.position = 0
             elif reg_type == 'logistic':
-                 y = (train_data.pct_change().dropna() > 0).astype(int).values
+                y = (train_data.pct_change().dropna() > 0).astype(int).values
                 model = LogisticRegression()
                 model.fit(X[:-1], y)  # Exclude the last observation
                 proba = model.predict_proba(X[-1].reshape(1, -1))[0,1]
