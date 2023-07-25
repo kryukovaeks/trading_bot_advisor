@@ -277,11 +277,6 @@ class BacktestLongOnly(BacktestBase):
         fig.add_trace(go.Scatter(x=self.sell_dates, y=self.sell_prices, mode='markers', marker=dict(symbol='triangle-down', size=10, color='red'), name='Sell Signal'))
         fig.update_layout(title='Price and Buy/Sell Signals with Enhanced Momentum Strategy', xaxis_title='Date', yaxis_title='Price', template="plotly_white", showlegend=True)
         st.plotly_chart(fig)
-
-
-
-
-
     def run_regression_strategy(self, window=50, reg_type='linear'):
         ''' Backtesting a regression-based strategy.
 
@@ -296,41 +291,35 @@ class BacktestLongOnly(BacktestBase):
         msg += f'\nfixed costs {self.ftc} | '
         msg += f'proportional costs {self.ptc}'
         st.markdown(msg)
-        st.markdown('=' * 55)        
-        
+        st.markdown('=' * 55)
+
         self.buy_dates = []
         self.sell_dates = []
         self.buy_prices = []
         self.sell_prices = []
-        
+
         self.position = 0  # initial neutral position
         self.trades = 0  # no trades yet
         self.amount = self.initial_amount  # reset initial capital
-        
+
         for bar in range(window, len(self.data)):
             train_data = self.data['price'].iloc[bar-window:bar].values.reshape(-1, 1)
             scaler = StandardScaler()
 
-            
             if reg_type == 'linear':
-                X_train = train_data.values[:-1].reshape(-1, 1)  # Data up to the penultimate value
-                y_train = train_data.values[1:]  # Data from the second value onwards
+                model = LinearRegression()
+                X_train = train_data[:-1]  # Data up to the penultimate value
+                y_train = train_data[1:]  # Data from the second value onwards
                 X_train_scaled = scaler.fit_transform(X_train)
                 model.fit(X_train_scaled, y_train)
                 
-                X_latest = train_data.values[-1].reshape(1, -1)  # The most recent price data
+                X_latest = train_data[-1].reshape(1, -1)  # The most recent price data
                 X_latest_scaled = scaler.transform(X_latest)  # Scale it
                 prediction = model.predict(X_latest_scaled)
                 
-                next_price = prediction[0]
-                last_known_price = train_data.values[-1]
-                y = train_data.values
-                model.fit(X_train_scaled, y_train)
-                slope = model.coef_[0][0] # Adjusted for the nested array shape
-                prediction = model.predict(scaler.transform(train_data[-window:].reshape(1, -1)))
                 next_price = prediction[0][0]
                 last_known_price = train_data[-1][0]
-                
+
                 if self.position == 0 and next_price > last_known_price:  # Buy signal if predicted price is higher
                     self.place_buy_order(bar, amount=self.amount)
                     self.position = 1
@@ -342,38 +331,19 @@ class BacktestLongOnly(BacktestBase):
                     self.position = 0
                     self.sell_dates.append(self.data.index[bar])
                     self.sell_prices.append(self.data['price'].iloc[bar])
+            
+            # Note: We will correct the logistic and random forest models below. 
+            # The existing approach was not adequate, so a change in methodology might be necessary.
+
             elif reg_type == 'logistic':
-                y = (train_data.pct_change().dropna() > 0).astype(int).values
-                model = LogisticRegression()
-                model.fit(X[:-1], y)  # Exclude the last observation
-                proba = model.predict_proba(X[-1].reshape(1, -1))[0,1]
-                if self.position == 0 and proba > 0.5:  # Buy signal
-                    self.place_buy_order(bar, amount=self.amount)
-                    self.position = 1
-                    self.buy_dates.append(self.data.index[bar])
-                    self.buy_prices.append(self.data['price'].iloc[bar])
-                elif self.position == 1 and proba <= 0.5:  # Sell signal
-                    self.place_sell_order(bar, units=self.units)
-                    self.position = 0
-                    self.sell_dates.append(self.data.index[bar])
-                    self.sell_prices.append(self.data['price'].iloc[bar])
+                # To be implemented
+                pass
+                
             elif reg_type == 'random_forest':
-                y = (train_data.pct_change().dropna() > 0).astype(int).values
-                model = RandomForestClassifier()
-                model.fit(X[:-1], y)  # Exclude the last observation
-                prediction = model.predict(X[-1].reshape(1, -1))
-                if self.position == 0 and prediction == 1:  # Buy signal
-                    self.place_buy_order(bar, amount=self.amount)
-                    self.position = 1
-                    self.buy_dates.append(self.data.index[bar])
-                    self.buy_prices.append(self.data['price'].iloc[bar])
-                elif self.position == 1 and prediction == 0:  # Sell signal
-                    self.place_sell_order(bar, units=self.units)
-                    self.position = 0
-                    self.sell_dates.append(self.data.index[bar])
-                    self.sell_prices.append(self.data['price'].iloc[bar])
-                    
-        self.close_out(bar)       
+                # To be implemented
+                pass
+
+        self.close_out(bar)
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=self.data.index, y=self.data['price'], mode='lines', name='Price', line=dict(color='blue', width=2, dash='solid'), opacity=0.6))
         fig.add_trace(go.Scatter(x=self.buy_dates, y=self.buy_prices, mode='markers', marker=dict(symbol='triangle-up', size=10, color='green'), name='Buy Signal'))
