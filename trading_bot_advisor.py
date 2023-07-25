@@ -286,7 +286,7 @@ if st.button("Run Backtest") and all_selected_tickers and start_date and end_dat
                 #df = scibt.select_data()
                 #scibt.run_strategy(df.index.min(), df.index[int(len(df)*0.8)],df.index[int(len(df)*0.8)+1],
                 #              df.index.max())
-                lobt2.run_linear_regression_strategy(self, window=50)
+                lobt2.run_linear_regression_strategy( window=50)
             run_strategies()
         except Exception as e:
             st.error(f"An error occurred: {str(e)}")
