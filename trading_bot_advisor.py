@@ -272,7 +272,7 @@ if st.button("Run Backtest") and all_selected_tickers and start_date and end_dat
             # For SMA strategy plotting, adjust the same way by creating a new Plotly figure and adding traces
             # ...
             st.markdown('Backtest LongOnly Strategy:')
-            lobt2 = BacktestLongOnly(s, start_date, end_date, amount, 10.0, 0.01, False)
+            lobt2 = BacktestLongOnly(s, start_date, end_date, amount, 0, 0, False)
             def run_strategies():
                 lobt2.run_sma_strategy(42, 252)
                 lobt2.run_momentum_strategy(6*30, 2*30)
