@@ -310,13 +310,20 @@ class BacktestLongOnly(BacktestBase):
         for bar in range(window, len(self.data)):
             train_data = self.data['price'].iloc[bar-window:bar].values.reshape(-1, 1)
             scaler = StandardScaler()
-            X_train = np.array([train_data[i: i + window].flatten() for i in range(len(train_data) - window)])
-            y_train = train_data[window:]
-            
-            # Scale the data
-            X_train_scaled = scaler.fit_transform(X_train)
+
             
             if reg_type == 'linear':
+                X_train = train_data.values[:-1].reshape(-1, 1)  # Data up to the penultimate value
+                y_train = train_data.values[1:]  # Data from the second value onwards
+                X_train_scaled = scaler.fit_transform(X_train)
+                model.fit(X_train_scaled, y_train)
+                
+                X_latest = train_data.values[-1].reshape(1, -1)  # The most recent price data
+                X_latest_scaled = scaler.transform(X_latest)  # Scale it
+                prediction = model.predict(X_latest_scaled)
+                
+                next_price = prediction[0]
+                last_known_price = train_data.values[-1]
                 y = train_data.values
                 model.fit(X_train_scaled, y_train)
                 slope = model.coef_[0][0] # Adjusted for the nested array shape
