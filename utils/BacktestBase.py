@@ -140,7 +140,7 @@ class BacktestBase(object):
         '''
         date, price = self.get_date_price(bar)
         if units is None:
-            units = int(amount / price)
+            units = amount / price #int
         self.amount -= (units * price) * (1 + self.ptc) + self.ftc
         self.units += units
         self.trades += 1
