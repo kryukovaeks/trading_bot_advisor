@@ -363,8 +363,27 @@ class BacktestLongOnly(BacktestBase):
                     self.sell_prices.append(self.data['price'].iloc[bar])
                 
             elif reg_type == 'random_forest':
-                # To be implemented
-                pass
+                y_bin = np.where(np.diff(train_data.flatten()) > 0, 1, 0)  # Calculate binary outcome: 1 if price rose, 0 if not
+                X_train_bin = train_data[:-1]  # Removing last value since we don't have a label for it
+                X_train_bin_scaled = scaler.fit_transform(X_train_bin)
+                model = RandomForestClassifier(n_estimators=100)  # Setting number of trees to 100. Can be adjusted.
+                model.fit(X_train_bin_scaled, y_bin)
+
+                X_latest = train_data[-1].reshape(1, -1)
+                X_latest_scaled = scaler.transform(X_latest)
+                predicted_movement = model.predict(X_latest_scaled)[0]
+
+                if self.position == 0 and predicted_movement == 1:  # Buy signal
+                    self.place_buy_order(bar, amount=self.amount)
+                    self.position = 1
+                    self.buy_dates.append(self.data.index[bar])
+                    self.buy_prices.append(self.data['price'].iloc[bar])
+                    
+                elif self.position == 1 and predicted_movement == 0:  # Sell signal
+                    self.place_sell_order(bar, units=self.units)
+                    self.position = 0
+                    self.sell_dates.append(self.data.index[bar])
+                    self.sell_prices.append(self.data['price'].iloc[bar])
 
         self.close_out(bar)
         fig = go.Figure()
