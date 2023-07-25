@@ -384,7 +384,31 @@ class BacktestLongOnly(BacktestBase):
                     self.position = 0
                     self.sell_dates.append(self.data.index[bar])
                     self.sell_prices.append(self.data['price'].iloc[bar])
+            elif reg_type == 'random_forest_reg':
+                X_train_rf = train_data[:-1]  # Data up to the penultimate value
+                y_train_rf = train_data[1:]   # Data from the second value onwards
+                X_train_rf_scaled = scaler.fit_transform(X_train_rf)
+                
+                model = RandomForestRegressor(n_estimators=100)  # Setting number of trees to 100. Can be adjusted.
+                model.fit(X_train_rf_scaled, y_train_rf.ravel())
 
+                X_latest = train_data[-1].reshape(1, -1)
+                X_latest_scaled = scaler.transform(X_latest)
+                predicted_price = model.predict(X_latest_scaled)[0]
+
+                last_known_price = train_data[-1]
+
+                if self.position == 0 and predicted_price > last_known_price:  # Buy signal
+                    self.place_buy_order(bar, amount=self.amount)
+                    self.position = 1
+                    self.buy_dates.append(self.data.index[bar])
+                    self.buy_prices.append(self.data['price'].iloc[bar])
+                    
+                elif self.position == 1 and predicted_price <= last_known_price:  # Sell signal
+                    self.place_sell_order(bar, units=self.units)
+                    self.position = 0
+                    self.sell_dates.append(self.data.index[bar])
+                    self.sell_prices.append(self.data['price'].iloc[bar])
         self.close_out(bar)
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=self.data.index, y=self.data['price'], mode='lines', name='Price', line=dict(color='blue', width=2, dash='solid'), opacity=0.6))
