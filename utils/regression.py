@@ -13,7 +13,7 @@ import yfinance as yf
 import numpy as np
 import pandas as pd
 from sklearn import linear_model
-
+import streamlit as st
 import random
 from sklearn.preprocessing import StandardScaler, Normalizer,MinMaxScaler
 
