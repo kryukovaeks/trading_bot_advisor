@@ -283,9 +283,10 @@ if st.button("Run Backtest") and all_selected_tickers and start_date and end_dat
                 lobt2.run_mean_reversion_strategy(50, 5)
                 lobt2.run_sma_improved_strategy(50, 5)
                 lobt2.run_enhanced_momentum_strategy( 50, 5, ma_period=200, threshold=0.01)
-                df = scibt.select_data()
-                scibt.run_strategy(df.index.min(), df.index[int(len(df)*0.8)],df.index[int(len(df)*0.8)+1],
-                              df.index.max())
+                #df = scibt.select_data()
+                #scibt.run_strategy(df.index.min(), df.index[int(len(df)*0.8)],df.index[int(len(df)*0.8)+1],
+                #              df.index.max())
+                lobt2.run_linear_regression_strategy(self, window=50)
             run_strategies()
         except Exception as e:
             st.error(f"An error occurred: {str(e)}")

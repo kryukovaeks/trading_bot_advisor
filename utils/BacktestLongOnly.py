@@ -275,3 +275,46 @@ class BacktestLongOnly(BacktestBase):
         fig.update_layout(title='Price and Buy/Sell Signals with Enhanced Momentum Strategy', xaxis_title='Date', yaxis_title='Price', template="plotly_white", showlegend=True)
         st.plotly_chart(fig)
 
+
+    def run_linear_regression_strategy(self, window=50):
+        ''' Backtesting a linear regression-based strategy.
+
+        Parameters
+        ==========
+        window: int
+            number of days to use for linear regression fitting
+        '''
+        from sklearn.linear_model import LinearRegression
+        from sklearn.preprocessing import StandardScaler
+        msg = f'\n\nRunning linear regression strategy | Window={window}'
+        msg += f'\nfixed costs {self.ftc} | '
+        msg += f'proportional costs {self.ptc}'
+        st.markdown(msg)
+        st.markdown('=' * 55)
+        
+        self.position = 0  # initial neutral position
+        self.trades = 0  # no trades yet
+        self.amount = self.initial_amount  # reset initial capital
+        
+        for bar in range(window, len(self.data)):
+            train_data = self.data['price'].iloc[bar-window:bar]
+            scaler = StandardScaler()
+            X = scaler.fit_transform(np.arange(window).reshape(-1, 1))
+            y = train_data.values
+            model = LinearRegression()
+            model.fit(X, y)
+            slope = model.coef_[0]
+            
+            if self.position == 0:
+                if slope > 0:  # If slope of regression line is positive
+                    self.place_buy_order(bar, amount=self.amount)
+                    self.position = 1
+                    price_entry = self.data['price'].iloc[bar]
+            elif self.position == 1:
+                if slope <= 0 or (price_entry < self.data['price'].iloc[bar]):  # Optional: consider selling if price drops
+                    self.place_sell_order(bar, units=self.units)
+                    self.position = 0
+                    
+        self.close_out(bar)
+
+
