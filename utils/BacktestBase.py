@@ -177,7 +177,7 @@ class BacktestBase(object):
         perf = ((self.amount - self.initial_amount) /
                 self.initial_amount * 100)
         st.text('Net Performance [%] {:.2f}'.format(perf))
-        st.text('Trades Executed [#] {:.2f}'.format(self.trades))
+        st.text('Trades Executed [#] {:.2f}'.format(self.trades-1))
         st.text('=' * 55)
     def print_hold(self):
         return ((self.data['price'][-1]/self.data['price'][0]-1)*100,'%')
