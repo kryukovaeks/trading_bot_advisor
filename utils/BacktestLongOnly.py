@@ -276,17 +276,22 @@ class BacktestLongOnly(BacktestBase):
         st.plotly_chart(fig)
 
 
-    def run_linear_regression_strategy(self, window=50):
-        ''' Backtesting a linear regression-based strategy.
+    from sklearn.linear_model import LinearRegression, LogisticRegression
+    from sklearn.ensemble import RandomForestClassifier
+    from sklearn.preprocessing import StandardScaler
+
+
+    def run_regression_strategy(self, window=50, reg_type='linear'):
+        ''' Backtesting a regression-based strategy.
 
         Parameters
         ==========
         window: int
-            number of days to use for linear regression fitting
+            number of days to use for regression fitting
+        reg_type: str
+            type of regression ('linear', 'logistic', 'random_forest')
         '''
-        from sklearn.linear_model import LinearRegression
-        from sklearn.preprocessing import StandardScaler
-        msg = f'\n\nRunning linear regression strategy | Window={window}'
+        msg = f'\n\nRunning {reg_type} regression strategy | Window={window}'
         msg += f'\nfixed costs {self.ftc} | '
         msg += f'proportional costs {self.ptc}'
         st.markdown(msg)
@@ -300,21 +305,40 @@ class BacktestLongOnly(BacktestBase):
             train_data = self.data['price'].iloc[bar-window:bar]
             scaler = StandardScaler()
             X = scaler.fit_transform(np.arange(window).reshape(-1, 1))
-            y = train_data.values
-            model = LinearRegression()
-            model.fit(X, y)
-            slope = model.coef_[0]
+            y = None
             
-            if self.position == 0:
-                if slope > 0:  # If slope of regression line is positive
+            if reg_type == 'linear':
+                y = train_data.values
+                model = LinearRegression()
+                model.fit(X, y)
+                slope = model.coef_[0]
+                if self.position == 0 and slope > 0:  # Buy signal
                     self.place_buy_order(bar, amount=self.amount)
                     self.position = 1
-                    price_entry = self.data['price'].iloc[bar]
-            elif self.position == 1:
-                if slope <= 0 or (price_entry < self.data['price'].iloc[bar]):  # Optional: consider selling if price drops
+                elif self.position == 1 and slope <= 0:  # Sell signal
+                    self.place_sell_order(bar, units=self.units)
+                    self.position = 0
+            elif reg_type == 'logistic':
+                 y = (train_data.pct_change().dropna() > 0).astype(int).values
+                model = LogisticRegression()
+                model.fit(X[:-1], y)  # Exclude the last observation
+                proba = model.predict_proba(X[-1].reshape(1, -1))[0,1]
+                if self.position == 0 and proba > 0.5:  # Buy signal
+                    self.place_buy_order(bar, amount=self.amount)
+                    self.position = 1
+                elif self.position == 1 and proba <= 0.5:  # Sell signal
+                    self.place_sell_order(bar, units=self.units)
+                    self.position = 0
+            elif reg_type == 'random_forest':
+                y = (train_data.pct_change().dropna() > 0).astype(int).values
+                model = RandomForestClassifier()
+                model.fit(X[:-1], y)  # Exclude the last observation
+                prediction = model.predict(X[-1].reshape(1, -1))
+                if self.position == 0 and prediction == 1:  # Buy signal
+                    self.place_buy_order(bar, amount=self.amount)
+                    self.position = 1
+                elif self.position == 1 and prediction == 0:  # Sell signal
                     self.place_sell_order(bar, units=self.units)
                     self.position = 0
                     
-        self.close_out(bar)
-
-
+            self.close_out(bar)
