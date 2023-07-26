@@ -451,8 +451,8 @@ class BacktestLongOnly(BacktestBase):
         self.position = 0  # initial neutral position
         self.trades = 0  # no trades yet
         self.amount = self.initial_amount  # reset initial capital
-        for bar in range(window, len(self.data)):
-            current_price = self.data['price'].iloc[bar]
+        for bar in range(window, len(self.full_data)):
+            current_price = self.full_data['price'].iloc[bar]
             train_data = self.full_data.iloc[bar-window:bar].values.reshape(-1, 1)
             scaler = StandardScaler()
             if reg_type == 'random_forest_reg':
@@ -477,8 +477,8 @@ class BacktestLongOnly(BacktestBase):
             if self.position == 0 and predicted_price > last_known_price:  # Buy signal
                 self.place_buy_order(bar, amount=self.amount)
                 self.position = 1
-                self.buy_dates.append(self.data.index[bar])
-                self.buy_prices.append(self.data['price'].iloc[bar])
+                self.buy_dates.append(self.full_data.index[bar])
+                self.buy_prices.append(self.full_data['price'].iloc[bar])
                 purchase_price = current_price 
                 
             elif self.position == 1:
@@ -487,11 +487,11 @@ class BacktestLongOnly(BacktestBase):
                     # Sell when either we've reached the desired gain or the predicted price is not higher
                     self.place_sell_order(bar, units=self.units)
                     self.position = 0
-                    self.sell_dates.append(self.data.index[bar])
+                    self.sell_dates.append(self.full_data.index[bar])
                     self.sell_prices.append(current_price)
         self.close_out(bar)
         fig = go.Figure()
-        fig.add_trace(go.Scatter(x=self.data.index, y=self.data['price'], mode='lines', name='Price', line=dict(color='blue', width=2, dash='solid'), opacity=0.6))
+        fig.add_trace(go.Scatter(x=self.full_data.index, y=self.full_data['price'], mode='lines', name='Price', line=dict(color='blue', width=2, dash='solid'), opacity=0.6))
         fig.add_trace(go.Scatter(x=self.buy_dates, y=self.buy_prices, mode='markers', marker=dict(symbol='triangle-up', size=10, color='green'), name='Buy Signal'))
         fig.add_trace(go.Scatter(x=self.sell_dates, y=self.sell_prices, mode='markers', marker=dict(symbol='triangle-down', size=10, color='red'), name='Sell Signal'))
         fig.update_layout(title=f'Price and Buy/Sell Signals with RFR Strategy', xaxis_title='Date', yaxis_title='Price', template="plotly_white", showlegend=True)
