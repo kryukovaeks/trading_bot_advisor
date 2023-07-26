@@ -121,12 +121,12 @@ class BacktestBase(object):
         raw = historical_data[['Open', 'High', 'Low', 'Close', 'Volume']].reset_index()
 
         # Feature Engineering
-        raw['7_day_MA'] = moving_average(raw, 7)
-        raw['15_day_MA'] = moving_average(raw, 15)
-        raw['30_day_MA'] = moving_average(raw, 30)
-        raw['RSI_14'] = RSI(raw, 14)
-        raw['Volatility_7'] = volatility(raw, 7)
-        raw['Volume_ROC'] = volume_roc(raw)
+        raw['7_day_MA'] = self.moving_average(raw, 7)
+        raw['15_day_MA'] = self.moving_average(raw, 15)
+        raw['30_day_MA'] = self.moving_average(raw, 30)
+        raw['RSI_14'] = self.RSI(raw, 14)
+        raw['Volatility_7'] = self.volatility(raw, 7)
+        raw['Volume_ROC'] = self.volume_roc(raw)
 
         self.full_data = raw.dropna().set_index('Date')
 #FEATURE ENGINEERING END
