@@ -412,7 +412,7 @@ class BacktestLongOnly(BacktestBase):
                     
                 elif self.position == 1:
                     percentage_gain = (current_price - purchase_price) / purchase_price
-                    if unrealized_gain >= gain_threshold :
+                    if percentage_gain >= gain_threshold :
                         # Sell when either we've reached the desired gain or the predicted price is not higher
                         self.place_sell_order(bar, units=self.units)
                         self.position = 0
@@ -478,7 +478,7 @@ class BacktestLongOnly(BacktestBase):
                     
                 elif self.position == 1:
                     percentage_gain = (current_price - purchase_price) / purchase_price
-                    if unrealized_gain >= gain_threshold :
+                    if percentage_gain >= gain_threshold :
                         # Sell when either we've reached the desired gain or the predicted price is not higher
                         self.place_sell_order(bar, units=self.units)
                         self.position = 0
