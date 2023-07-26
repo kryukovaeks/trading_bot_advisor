@@ -70,6 +70,7 @@ class BacktestBase(object):
         self.trades = 0
         self.verbose = verbose
         self.get_data()
+        self.get_data_full()
 
     def get_data(self):
         ''' Retrieves and prepares the data.
@@ -85,7 +86,23 @@ class BacktestBase(object):
         raw = historical_data['Close'].reset_index().rename(columns={'Close': 'price'})
         raw['return'] = np.log(raw['price'] / raw['price'].shift(1))
         self.data = raw.dropna().set_index('Date')
+    def get_data_full(self):
+        ''' Retrieves and prepares the data including Open, High, Low, Volume.
+            '''
+        stock = yf.Ticker(self.symbol)
 
+        if self.start==False and self.end==False:
+            historical_data = stock.history(period='max')
+        else:
+            historical_data = stock.history(start=self.start, end=self.end)
+
+        raw = historical_data[['Open', 'High', 'Low', 'Close', 'Volume']].reset_index()
+        #raw = raw.rename(columns={'Close': 'price', 'Open': 'open', 'High': 'high', 'Low': 'low', 'Volume': 'volume'})
+
+        # Calculate returns based on adjusted closing prices
+        #raw['return'] = np.log(raw['price'] / raw['price'].shift(1))
+
+        self.full_data = raw.dropna().set_index('Date')
     def plot_data(self, cols=None):
         ''' Plots the closing prices for symbol.
         '''

@@ -423,3 +423,69 @@ class BacktestLongOnly(BacktestBase):
         fig.add_trace(go.Scatter(x=self.sell_dates, y=self.sell_prices, mode='markers', marker=dict(symbol='triangle-down', size=10, color='red'), name='Sell Signal'))
         fig.update_layout(title=f'Price and Buy/Sell Signals with {reg_type.capitalize()} Regression Strategy', xaxis_title='Date', yaxis_title='Price', template="plotly_white", showlegend=True)
         st.plotly_chart(fig)
+    def run_ml_strategy_more_features(self, window=50, reg_type='linear', gain_threshold=0.02):
+        ''' Backtesting a regression-based strategy.
+
+        Parameters
+        ==========
+        window: int
+            number of days to use for regression fitting
+        reg_type: str
+            type of regression ('linear', 'logistic', 'random_forest')
+        '''
+        msg = f'\n\nRunning {reg_type} regression strategy | Window={window}'
+        msg += f'\nfixed costs {self.ftc} | '
+        msg += f'proportional costs {self.ptc}'
+        st.markdown(msg)
+        st.markdown('=' * 55)
+
+        self.buy_dates = []
+        self.sell_dates = []
+        self.buy_prices = []
+        self.sell_prices = []
+
+        self.position = 0  # initial neutral position
+        self.trades = 0  # no trades yet
+        self.amount = self.initial_amount  # reset initial capital
+        for bar in range(window, len(self.data)):
+            current_price = self.data['price'].iloc[bar]
+            train_data = self.full_data.iloc[bar-window:bar].values.reshape(-1, 1)
+            scaler = StandardScaler()
+            if reg_type == 'random_forest_reg':
+                X_train_rf = train_data[:-1]  # Data up to the penultimate value
+                y_train_rf = train_data[1:]   # Data from the second value onwards
+                X_train_rf_scaled = scaler.fit_transform(X_train_rf)
+                
+                model = RandomForestRegressor(n_estimators=100)  # Setting number of trees to 100. Can be adjusted.
+                model.fit(X_train_rf_scaled, y_train_rf.ravel())
+
+                X_latest = train_data[-1].reshape(1, -1)
+                X_latest_scaled = scaler.transform(X_latest)
+                predicted_price = model.predict(X_latest_scaled)[0]
+
+                last_known_price = train_data[-1]
+
+                
+
+                if self.position == 0 and predicted_price > last_known_price:  # Buy signal
+                    self.place_buy_order(bar, amount=self.amount)
+                    self.position = 1
+                    self.buy_dates.append(self.data.index[bar])
+                    self.buy_prices.append(self.data['price'].iloc[bar])
+                    purchase_price = current_price 
+                    
+                elif self.position == 1:
+                    percentage_gain = (current_price - purchase_price) / purchase_price
+                    if unrealized_gain >= gain_threshold :
+                        # Sell when either we've reached the desired gain or the predicted price is not higher
+                        self.place_sell_order(bar, units=self.units)
+                        self.position = 0
+                        self.sell_dates.append(self.data.index[bar])
+                        self.sell_prices.append(current_price)
+        self.close_out(bar)
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=self.data.index, y=self.data['price'], mode='lines', name='Price', line=dict(color='blue', width=2, dash='solid'), opacity=0.6))
+        fig.add_trace(go.Scatter(x=self.buy_dates, y=self.buy_prices, mode='markers', marker=dict(symbol='triangle-up', size=10, color='green'), name='Buy Signal'))
+        fig.add_trace(go.Scatter(x=self.sell_dates, y=self.sell_prices, mode='markers', marker=dict(symbol='triangle-down', size=10, color='red'), name='Sell Signal'))
+        fig.update_layout(title=f'Price and Buy/Sell Signals with {reg_type.capitalize()} Regression Strategy', xaxis_title='Date', yaxis_title='Price', template="plotly_white", showlegend=True)
+        st.plotly_chart(fig)
