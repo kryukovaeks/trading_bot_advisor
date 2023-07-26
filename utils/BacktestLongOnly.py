@@ -13,6 +13,8 @@ from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestRegressor
+import xgboost as xgb
+
 class BacktestLongOnly(BacktestBase):
 
 
@@ -454,36 +456,39 @@ class BacktestLongOnly(BacktestBase):
             train_data = self.full_data.iloc[bar-window:bar].values.reshape(-1, 1)
             scaler = StandardScaler()
             if reg_type == 'random_forest_reg':
-                X_train_rf = train_data[:-1]  # Data up to the penultimate value
-                y_train_rf = train_data[1:]   # Data from the second value onwards
-                X_train_rf_scaled = scaler.fit_transform(X_train_rf)
-                
                 model = RandomForestRegressor(n_estimators=100)  # Setting number of trees to 100. Can be adjusted.
-                model.fit(X_train_rf_scaled, y_train_rf.ravel())
+            elif reg_type == 'xgboost':
+                model = xgb.XGBRegressor(objective ='reg:squarederror')
+            X_train_rf = train_data[:-1]  # Data up to the penultimate value
+            y_train_rf = train_data[1:]   # Data from the second value onwards
+            X_train_rf_scaled = scaler.fit_transform(X_train_rf)
+            
+            
+            model.fit(X_train_rf_scaled, y_train_rf.ravel())
 
-                X_latest = train_data[-1].reshape(1, -1)
-                X_latest_scaled = scaler.transform(X_latest)
-                predicted_price = model.predict(X_latest_scaled)[0]
+            X_latest = train_data[-1].reshape(1, -1)
+            X_latest_scaled = scaler.transform(X_latest)
+            predicted_price = model.predict(X_latest_scaled)[0]
 
-                last_known_price = train_data[-1]
+            last_known_price = train_data[-1]
 
+            
+
+            if self.position == 0 and predicted_price > last_known_price:  # Buy signal
+                self.place_buy_order(bar, amount=self.amount)
+                self.position = 1
+                self.buy_dates.append(self.data.index[bar])
+                self.buy_prices.append(self.data['price'].iloc[bar])
+                purchase_price = current_price 
                 
-
-                if self.position == 0 and predicted_price > last_known_price:  # Buy signal
-                    self.place_buy_order(bar, amount=self.amount)
-                    self.position = 1
-                    self.buy_dates.append(self.data.index[bar])
-                    self.buy_prices.append(self.data['price'].iloc[bar])
-                    purchase_price = current_price 
-                    
-                elif self.position == 1:
-                    percentage_gain = (current_price - purchase_price) / purchase_price
-                    if percentage_gain >= gain_threshold :
-                        # Sell when either we've reached the desired gain or the predicted price is not higher
-                        self.place_sell_order(bar, units=self.units)
-                        self.position = 0
-                        self.sell_dates.append(self.data.index[bar])
-                        self.sell_prices.append(current_price)
+            elif self.position == 1:
+                percentage_gain = (current_price - purchase_price) / purchase_price
+                if percentage_gain >= gain_threshold :
+                    # Sell when either we've reached the desired gain or the predicted price is not higher
+                    self.place_sell_order(bar, units=self.units)
+                    self.position = 0
+                    self.sell_dates.append(self.data.index[bar])
+                    self.sell_prices.append(current_price)
         self.close_out(bar)
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=self.data.index, y=self.data['price'], mode='lines', name='Price', line=dict(color='blue', width=2, dash='solid'), opacity=0.6))
