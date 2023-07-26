@@ -87,10 +87,10 @@ class BacktestBase(object):
         raw['return'] = np.log(raw['price'] / raw['price'].shift(1))
         self.data = raw.dropna().set_index('Date')
 #FEATURE ENGINEERING START
-    def moving_average(df, window):
+    def moving_average(self,df, window):
         return df['Close'].rolling(window=window).mean()
 
-    def RSI(df, window):
+    def RSI(self,df, window):
         delta = df['Close'].diff()
         loss = np.where(delta < 0, -delta, 0)
         gain = np.where(delta > 0, delta, 0)
@@ -102,10 +102,10 @@ class BacktestBase(object):
         rsi = 100 - (100 / (1 + rs))
         return rsi
 
-    def volatility(df, window):
+    def volatility(self,df, window):
         return df['Close'].rolling(window=window).std()
 
-    def volume_roc(df):
+    def volume_roc(self,df):
         return df['Volume'].pct_change()
 
     def get_data_full(self):
