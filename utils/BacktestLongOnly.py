@@ -12,8 +12,9 @@ import plotly.graph_objects as go
 from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import StandardScaler
-class BacktestLongOnly(BacktestBase):
 from sklearn.ensemble import RandomForestRegressor
+class BacktestLongOnly(BacktestBase):
+
 
     def run_sma_strategy(self, SMA1, SMA2):
         ''' Backtesting a SMA-based strategy.
