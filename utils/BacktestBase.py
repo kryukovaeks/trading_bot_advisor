@@ -130,6 +130,7 @@ class BacktestBase(object):
         raw['RSI_14'] = self.RSI(raw, 14)
         raw['Volatility_7'] = self.volatility(raw, 7)
         raw['Volume_ROC'] = self.volume_roc(raw)
+        raw['return'] = np.log(raw['price'] / raw['price'].shift(1))
 
         self.full_data = raw.dropna().set_index('Date')
 #FEATURE ENGINEERING END

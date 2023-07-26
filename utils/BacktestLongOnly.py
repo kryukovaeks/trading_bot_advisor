@@ -452,34 +452,34 @@ class BacktestLongOnly(BacktestBase):
         self.trades = 0  # no trades yet
         self.amount = self.initial_amount  # reset initial capital
         for bar in range(window, len(self.full_data)):
-            current_price = self.full_data['price'].iloc[bar]
-            train_data = self.full_data.iloc[bar-window:bar].values.reshape(-1, 1)
+            current_price = self.full_data['Close'].iloc[bar]
+            train_data = self.full_data.iloc[bar-window:bar].values
             scaler = StandardScaler()
             if reg_type == 'random_forest_reg':
                 model = RandomForestRegressor(n_estimators=100)  # Setting number of trees to 100. Can be adjusted.
             elif reg_type == 'xgboost':
                 model = xgb.XGBRegressor(objective ='reg:squarederror')
-            X_train_rf = train_data[:-1]  # Data up to the penultimate value
-            y_train_rf = train_data[1:]   # Data from the second value onwards
+            X_train_rf = train_data  # Data up to the penultimate value
+            y_train_rf = self.full_data.iloc[bar-window:bar+1]['return'].shift(-1).values    # Data from the second value onwards
             X_train_rf_scaled = scaler.fit_transform(X_train_rf)
             
             
-            model.fit(X_train_rf_scaled, y_train_rf.ravel())
+            model.fit(X_train_rf_scaled, y_train_rf)
 
-            X_latest = train_data[-1].reshape(1, -1)
+            X_latest = self.full_data.iloc[bar].values
             X_latest_scaled = scaler.transform(X_latest)
-            predicted_price = model.predict(X_latest_scaled)[0]
-
-            last_known_price = train_data[-1]
+            predicted_return = model.predict(X_latest_scaled)[0]
 
             
 
-            if self.position == 0 and predicted_price > last_known_price:  # Buy signal
+            
+
+            if self.position == 0 and predicted_return>0:  # Buy signal
                 self.place_buy_order(bar, amount=self.amount)
                 self.position = 1
                 self.buy_dates.append(self.full_data.index[bar])
-                self.buy_prices.append(self.full_data['price'].iloc[bar])
-                purchase_price = current_price 
+                self.buy_prices.append(self.full_data['Close'].iloc[bar])
+                purchase_price = self.full_data['Close'].iloc[bar]
                 
             elif self.position == 1:
                 percentage_gain = (current_price - purchase_price) / purchase_price
@@ -491,7 +491,7 @@ class BacktestLongOnly(BacktestBase):
                     self.sell_prices.append(current_price)
         self.close_out(bar)
         fig = go.Figure()
-        fig.add_trace(go.Scatter(x=self.full_data.index, y=self.full_data['price'], mode='lines', name='Price', line=dict(color='blue', width=2, dash='solid'), opacity=0.6))
+        fig.add_trace(go.Scatter(x=self.full_data.index, y=self.full_data['Close'], mode='lines', name='Price', line=dict(color='blue', width=2, dash='solid'), opacity=0.6))
         fig.add_trace(go.Scatter(x=self.buy_dates, y=self.buy_prices, mode='markers', marker=dict(symbol='triangle-up', size=10, color='green'), name='Buy Signal'))
         fig.add_trace(go.Scatter(x=self.sell_dates, y=self.sell_prices, mode='markers', marker=dict(symbol='triangle-down', size=10, color='red'), name='Sell Signal'))
         fig.update_layout(title=f'Price and Buy/Sell Signals with RFR Strategy', xaxis_title='Date', yaxis_title='Price', template="plotly_white", showlegend=True)
