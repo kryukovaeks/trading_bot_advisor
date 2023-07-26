@@ -453,14 +453,17 @@ class BacktestLongOnly(BacktestBase):
         self.amount = self.initial_amount  # reset initial capital
         for bar in range(window, len(self.full_data)):
             current_price = self.full_data['Close'].iloc[bar]
-            train_data = self.full_data.iloc[bar-window:bar].values
+
+            train_data = self.full_data.iloc[bar-window:bar+1]
+            train_data['y'] = self.full_data.iloc[bar-window:bar+1]['return'].shift(-1)
+            #train_data = train_data.dropna(subset= 'y')
             scaler = StandardScaler()
             if reg_type == 'random_forest_reg':
                 model = RandomForestRegressor(n_estimators=100)  # Setting number of trees to 100. Can be adjusted.
             elif reg_type == 'xgboost':
                 model = xgb.XGBRegressor(objective ='reg:squarederror')
-            X_train_rf = train_data  # Data up to the penultimate value
-            y_train_rf = self.full_data.iloc[bar-window:bar+1]['return'].shift(-1).values[:-1]    # Data from the second value onwards
+            X_train_rf = train_data.iloc[:-1,:-1].values  # Data up to the penultimate value
+            y_train_rf = train_data['y'][:-1]   # Data from the second value onwards
             X_train_rf_scaled = scaler.fit_transform(X_train_rf)
             
             
