@@ -437,7 +437,7 @@ class BacktestLongOnly(BacktestBase):
         reg_type: str
             type of regression ('linear', 'logistic', 'random_forest')
         '''
-        msg = f'\n\nRunning RFR for many features regression strategy | Window={window}'
+        msg = f'\n\nRunning {reg_type} for many features regression strategy | Window={window}'
         msg += f'\nfixed costs {self.ftc} | '
         msg += f'proportional costs {self.ptc}'
         st.markdown(msg)
