@@ -93,16 +93,17 @@ class BacktestBase(object):
     def RSI(self, df, window):
         delta = df['Close'].diff()
         
-        # Using .loc to ensure that the result remains a pandas Series
-        loss = df['Close'].loc[delta < 0].abs()
-        gain = df['Close'].loc[delta > 0]
-        
-        avg_gain = gain.rolling(window=window).mean().fillna(0)
-        avg_loss = loss.rolling(window=window).mean().fillna(0)
+        # Replace np.where with direct pandas operations
+        gain = delta.where(delta > 0, 0)
+        loss = -delta.where(delta < 0, 0)
+
+        avg_gain = gain.rolling(window=window).mean()
+        avg_loss = loss.rolling(window=window).mean()
 
         rs = avg_gain / avg_loss
         rsi = 100 - (100 / (1 + rs))
         return rsi
+
 
     def volatility(self,df, window):
         return df['Close'].rolling(window=window).std()
