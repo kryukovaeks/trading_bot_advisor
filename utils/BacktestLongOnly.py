@@ -460,7 +460,7 @@ class BacktestLongOnly(BacktestBase):
             elif reg_type == 'xgboost':
                 model = xgb.XGBRegressor(objective ='reg:squarederror')
             X_train_rf = train_data  # Data up to the penultimate value
-            y_train_rf = self.full_data.iloc[bar-window:bar+1]['return'].shift(-1).values    # Data from the second value onwards
+            y_train_rf = self.full_data.iloc[bar-window:bar+1]['return'].shift(-1).values[:-1]    # Data from the second value onwards
             X_train_rf_scaled = scaler.fit_transform(X_train_rf)
             
             
