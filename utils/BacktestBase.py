@@ -86,9 +86,31 @@ class BacktestBase(object):
         raw = historical_data['Close'].reset_index().rename(columns={'Close': 'price'})
         raw['return'] = np.log(raw['price'] / raw['price'].shift(1))
         self.data = raw.dropna().set_index('Date')
+#FEATURE ENGINEERING START
+    def moving_average(df, window):
+        return df['Close'].rolling(window=window).mean()
+
+    def RSI(df, window):
+        delta = df['Close'].diff()
+        loss = np.where(delta < 0, -delta, 0)
+        gain = np.where(delta > 0, delta, 0)
+        
+        avg_gain = gain.rolling(window=window).mean()
+        avg_loss = loss.rolling(window=window).mean()
+
+        rs = avg_gain / avg_loss
+        rsi = 100 - (100 / (1 + rs))
+        return rsi
+
+    def volatility(df, window):
+        return df['Close'].rolling(window=window).std()
+
+    def volume_roc(df):
+        return df['Volume'].pct_change()
+
     def get_data_full(self):
         ''' Retrieves and prepares the data including Open, High, Low, Volume.
-            '''
+        '''
         stock = yf.Ticker(self.symbol)
 
         if self.start==False and self.end==False:
@@ -97,12 +119,17 @@ class BacktestBase(object):
             historical_data = stock.history(start=self.start, end=self.end)
 
         raw = historical_data[['Open', 'High', 'Low', 'Close', 'Volume']].reset_index()
-        #raw = raw.rename(columns={'Close': 'price', 'Open': 'open', 'High': 'high', 'Low': 'low', 'Volume': 'volume'})
 
-        # Calculate returns based on adjusted closing prices
-        #raw['return'] = np.log(raw['price'] / raw['price'].shift(1))
+        # Feature Engineering
+        raw['7_day_MA'] = moving_average(raw, 7)
+        raw['15_day_MA'] = moving_average(raw, 15)
+        raw['30_day_MA'] = moving_average(raw, 30)
+        raw['RSI_14'] = RSI(raw, 14)
+        raw['Volatility_7'] = volatility(raw, 7)
+        raw['Volume_ROC'] = volume_roc(raw)
 
         self.full_data = raw.dropna().set_index('Date')
+#FEATURE ENGINEERING END
     def plot_data(self, cols=None):
         ''' Plots the closing prices for symbol.
         '''
