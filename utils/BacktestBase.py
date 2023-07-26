@@ -90,13 +90,15 @@ class BacktestBase(object):
     def moving_average(self,df, window):
         return df['Close'].rolling(window=window).mean()
 
-    def RSI(self,df, window):
+    def RSI(self, df, window):
         delta = df['Close'].diff()
-        loss = np.where(delta < 0, -delta, 0)
-        gain = np.where(delta > 0, delta, 0)
         
-        avg_gain = gain.rolling(window=window).mean()
-        avg_loss = loss.rolling(window=window).mean()
+        # Using .loc to ensure that the result remains a pandas Series
+        loss = df['Close'].loc[delta < 0].abs()
+        gain = df['Close'].loc[delta > 0]
+        
+        avg_gain = gain.rolling(window=window).mean().fillna(0)
+        avg_loss = loss.rolling(window=window).mean().fillna(0)
 
         rs = avg_gain / avg_loss
         rsi = 100 - (100 / (1 + rs))
