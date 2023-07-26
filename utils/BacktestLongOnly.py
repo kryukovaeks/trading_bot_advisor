@@ -14,6 +14,10 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestRegressor
 import xgboost as xgb
+import warnings
+
+# Before the function where you want to ignore warnings
+warnings.filterwarnings('ignore')
 
 class BacktestLongOnly(BacktestBase):
 
@@ -469,7 +473,7 @@ class BacktestLongOnly(BacktestBase):
             
             model.fit(X_train_rf_scaled, y_train_rf)
 
-            X_latest = self.full_data.iloc[bar].values
+            X_latest = self.full_data.iloc[bar].values.reshape(-1,12)
             X_latest_scaled = scaler.transform(X_latest)
             predicted_return = model.predict(X_latest_scaled)[0]
 

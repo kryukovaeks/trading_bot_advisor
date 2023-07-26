@@ -132,8 +132,8 @@ class BacktestBase(object):
         raw['Volume_ROC'] = self.volume_roc(raw)
         raw['return'] = np.log(raw['Close'] / raw['Close'].shift(1))
 
-        self.full_data = raw.dropna().set_index('Date')
-#FEATURE ENGINEERING END
+        self.full_data = raw.dropna().set_index('Date').replace([np.inf, -np.inf], 0)
+#FEATURE ENGINEERING END        
     def plot_data(self, cols=None):
         ''' Plots the closing prices for symbol.
         '''
