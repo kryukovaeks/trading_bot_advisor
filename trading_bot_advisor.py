@@ -289,7 +289,8 @@ if st.button("Run Backtest") and all_selected_tickers and start_date and end_dat
                 lobt2.run_regression_strategy( window=50, reg_type='linear')
                 lobt2.run_regression_strategy( window=50, reg_type='logistic')
                 #lobt2.run_regression_strategy( window=50, reg_type='random_forest')
-                lobt2.run_ml_strategy_more_features( window=50,  gain_threshold=0.02)
+                lobt2.run_ml_strategy_more_features( window=50, reg_type = 'random_forest_reg', gain_threshold=0.02)
+                lobt2.run_ml_strategy_more_features( window=50, reg_type = 'xgboost', gain_threshold=0.02)
             run_strategies()
         except Exception as e:
             st.error(f"An error occurred: {str(e)}")
