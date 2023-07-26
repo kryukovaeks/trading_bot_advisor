@@ -423,7 +423,7 @@ class BacktestLongOnly(BacktestBase):
         fig.add_trace(go.Scatter(x=self.sell_dates, y=self.sell_prices, mode='markers', marker=dict(symbol='triangle-down', size=10, color='red'), name='Sell Signal'))
         fig.update_layout(title=f'Price and Buy/Sell Signals with {reg_type.capitalize()} Regression Strategy', xaxis_title='Date', yaxis_title='Price', template="plotly_white", showlegend=True)
         st.plotly_chart(fig)
-    def run_ml_strategy_more_features(self, window=50, reg_type='linear', gain_threshold=0.02):
+    def run_ml_strategy_more_features(self, window=50,  gain_threshold=0.02):
         ''' Backtesting a regression-based strategy.
 
         Parameters
@@ -433,7 +433,7 @@ class BacktestLongOnly(BacktestBase):
         reg_type: str
             type of regression ('linear', 'logistic', 'random_forest')
         '''
-        msg = f'\n\nRunning {reg_type} regression strategy | Window={window}'
+        msg = f'\n\nRunning RFR for many features regression strategy | Window={window}'
         msg += f'\nfixed costs {self.ftc} | '
         msg += f'proportional costs {self.ptc}'
         st.markdown(msg)
