@@ -86,14 +86,12 @@ class BacktestBase(object):
         raw = historical_data['Close'].reset_index().rename(columns={'Close': 'price'})
         raw['return'] = np.log(raw['price'] / raw['price'].shift(1))
         self.data = raw.dropna().set_index('Date')
-#FEATURE ENGINEERING START
-    def moving_average(self,df, window):
+    # FEATURE ENGINEERING START
+    def moving_average(self, df, window):
         return df['Close'].rolling(window=window).mean()
 
     def RSI(self, df, window):
         delta = df['Close'].diff()
-        
-        # Replace np.where with direct pandas operations
         gain = delta.where(delta > 0, 0)
         loss = -delta.where(delta < 0, 0)
 
@@ -104,23 +102,23 @@ class BacktestBase(object):
         rsi = 100 - (100 / (1 + rs))
         return rsi
 
-
-    def volatility(self,df, window):
+    def volatility(self, df, window):
         return df['Close'].rolling(window=window).std()
 
-    def volume_roc(self,df):
+    def volume_roc(self, df):
         return df['Volume'].pct_change()
 
     def get_data_full(self):
-        ''' Retrieves and prepares the data including Open, High, Low, Volume.
+        ''' Retrieves and prepares the data.
         '''
         stock = yf.Ticker(self.symbol)
-
+        
+        # Fetch data
         if self.start==False and self.end==False:
             historical_data = stock.history(period='max')
         else:
             historical_data = stock.history(start=self.start, end=self.end)
-
+        
         raw = historical_data[['Open', 'High', 'Low', 'Close', 'Volume']].reset_index()
 
         # Feature Engineering
@@ -131,9 +129,37 @@ class BacktestBase(object):
         raw['Volatility_7'] = self.volatility(raw, 7)
         raw['Volume_ROC'] = self.volume_roc(raw)
         raw['return'] = np.log(raw['Close'] / raw['Close'].shift(1))
+        
+        # MACD
+        macd = MACD(raw['Close'])
+        raw['macd_diff'] = macd.macd_diff()
+
+        # Aroon
+        aroon = AroonIndicator(raw['Close'])
+        raw['aroon_up'] = aroon.aroon_up()
+        raw['aroon_down'] = aroon.aroon_down()
+
+        # OBV
+        obv = OnBalanceVolumeIndicator(raw['Close'], raw['Volume'])
+        raw['obv'] = obv.on_balance_volume()
+
+        # Ichimoku Cloud
+        raw['ichi_a'] = (raw['High'].rolling(window=9).max() + raw['Low'].rolling(window=9).min()) / 2  # Tenkan-sen
+        raw['ichi_b'] = (raw['High'].rolling(window=26).max() + raw['Low'].rolling(window=26).min()) / 2  # Kijun-sen
+
+        # Stochastic Oscillator
+        stoch = StochasticOscillator(raw['High'], raw['Low'], raw['Close'])
+        raw['stoch'] = stoch.stoch()
+
+        # For Fibonacci Retracement, we need only levels. Actual retracement lines will be drawn based on significant highs/lows
+        fib_levels = [0.0, 0.236, 0.382, 0.5, 0.618, 0.786, 1.0]
+        raw['high_prev'] = raw['High'].shift(1)
+        raw['low_prev'] = raw['Low'].shift(1)
+        for level in fib_levels:
+            raw[f'fib_{level*100}%'] = raw['low_prev'] + (raw['high_prev'] - raw['low_prev']) * level
 
         self.full_data = raw.dropna().set_index('Date').replace([np.inf, -np.inf], 0)
-#FEATURE ENGINEERING END        
+    # FEATURE ENGINEERING END       
     def plot_data(self, cols=None):
         ''' Plots the closing prices for symbol.
         '''

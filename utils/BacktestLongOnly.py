@@ -431,6 +431,8 @@ class BacktestLongOnly(BacktestBase):
         fig.add_trace(go.Scatter(x=self.sell_dates, y=self.sell_prices, mode='markers', marker=dict(symbol='triangle-down', size=10, color='red'), name='Sell Signal'))
         fig.update_layout(title=f'Price and Buy/Sell Signals with {reg_type.capitalize()} Regression Strategy', xaxis_title='Date', yaxis_title='Price', template="plotly_white", showlegend=True)
         st.plotly_chart(fig)
+
+
     def run_ml_strategy_more_features(self, window=50, reg_type = 'random_forest_reg', gain_threshold=0.02):
         ''' Backtesting a regression-based strategy.
 
@@ -444,18 +446,17 @@ class BacktestLongOnly(BacktestBase):
         msg = f'\n\nRunning {reg_type} for many features regression strategy | Window={window}'
         msg += f'\nfixed costs {self.ftc} | '
         msg += f'proportional costs {self.ptc}'
-        st.markdown(msg)
-        st.markdown('=' * 55)
+  
 
         self.buy_dates = []
         self.sell_dates = []
         self.buy_prices = []
         self.sell_prices = []
-
+        self.correct_sign_predictions = 0
         self.position = 0  # initial neutral position
-        self.trades = 0  # no trades yet
+        self.trades = 0  # no trades yetx
         self.amount = self.initial_amount  # reset initial capital
-        for bar in range(window, len(self.full_data)):
+        for bar in range(window, len(self.full_data)-1):
             current_price = self.full_data['Close'].iloc[bar]
 
             train_data = self.full_data.iloc[bar-window:bar+1]
@@ -464,23 +465,47 @@ class BacktestLongOnly(BacktestBase):
             scaler = StandardScaler()
             if reg_type == 'random_forest_reg':
                 model = RandomForestRegressor(n_estimators=100)  # Setting number of trees to 100. Can be adjusted.
+                X_train_rf = train_data.iloc[:-1,:-1].values  # Data up to the penultimate value
+                y_train_rf = train_data['y'][:-1]   # Data from the second value onwards
+                X_train_rf_scaled = scaler.fit_transform(X_train_rf)
+
+
+                model.fit(X_train_rf_scaled, y_train_rf)
+
+                X_latest = self.full_data.iloc[bar].values.reshape(-1, train_data.iloc[:-1,:-1].shape[1])
+                X_latest_scaled = scaler.transform(X_latest)
+                predicted_return = model.predict(X_latest_scaled)[0]
             elif reg_type == 'xgboost':
                 model = xgb.XGBRegressor(objective ='reg:squarederror')
-            X_train_rf = train_data.iloc[:-1,:-1].values  # Data up to the penultimate value
-            y_train_rf = train_data['y'][:-1]   # Data from the second value onwards
-            X_train_rf_scaled = scaler.fit_transform(X_train_rf)
-            
-            
-            model.fit(X_train_rf_scaled, y_train_rf)
+                X_train_rf = train_data.iloc[:-1,:-1].values  # Data up to the penultimate value
+                y_train_rf = train_data['y'][:-1]   # Data from the second value onwards
+                X_train_rf_scaled = scaler.fit_transform(X_train_rf)
 
-            X_latest = self.full_data.iloc[bar].values.reshape(-1,12)
-            X_latest_scaled = scaler.transform(X_latest)
-            predicted_return = model.predict(X_latest_scaled)[0]
 
-            
+                model.fit(X_train_rf_scaled, y_train_rf)
 
-            
+                X_latest = self.full_data.iloc[bar].values.reshape(-1, train_data.iloc[:-1,:-1].shape[1])
+                X_latest_scaled = scaler.transform(X_latest)
+                predicted_return = model.predict(X_latest_scaled)[0]
+            elif reg_type =='lstm':
+                model = Sequential()
+                model.add(LSTM(lstm_units, input_shape=(window, train_data.shape[1]-1)))
+                model.add(Dense(1))
+                model.compile(optimizer='adam', loss='mean_squared_error')
 
+                X_train_lstm = train_data.iloc[:-1, :-1].values.reshape(-1, window, train_data.shape[1]-1)
+                y_train_lstm = train_data['y'][:-1].values
+                X_train_lstm_scaled = scaler.fit_transform(X_train_lstm.reshape(-1, train_data.shape[1]-1)).reshape(-1, window, train_data.shape[1]-1)
+
+                model.fit(X_train_lstm_scaled, y_train_lstm, epochs=10, verbose=0)
+
+                X_latest = self.full_data.iloc[bar-window:bar, :-1].values.reshape(1, window, train_data.shape[1]-1)
+                X_latest_scaled = scaler.transform(X_latest.reshape(-1, train_data.shape[1]-1)).reshape(1, window, train_data.shape[1]-1)
+                predicted_return = model.predict(X_latest_scaled)[0][0]
+
+            actual_return = self.full_data['return'].iloc[bar + 1]
+            if np.sign(predicted_return) == np.sign(actual_return):
+                self.correct_sign_predictions += 1 
             if self.position == 0 and predicted_return>0:  # Buy signal
                 self.place_buy_order(bar, amount=self.amount)
                 self.position = 1
@@ -497,9 +522,16 @@ class BacktestLongOnly(BacktestBase):
                     self.sell_dates.append(self.full_data.index[bar])
                     self.sell_prices.append(current_price)
         self.close_out(bar)
+        total_predictions = len(self.full_data) - window - 1
+        sign_accuracy = self.correct_sign_predictions / total_predictions
+
+        # Display the Sign Accuracy
+        print(f'Sign Accuracy: {sign_accuracy:.2f}')
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=self.full_data.index, y=self.full_data['Close'], mode='lines', name='Price', line=dict(color='blue', width=2, dash='solid'), opacity=0.6))
         fig.add_trace(go.Scatter(x=self.buy_dates, y=self.buy_prices, mode='markers', marker=dict(symbol='triangle-up', size=10, color='green'), name='Buy Signal'))
         fig.add_trace(go.Scatter(x=self.sell_dates, y=self.sell_prices, mode='markers', marker=dict(symbol='triangle-down', size=10, color='red'), name='Sell Signal'))
-        fig.update_layout(title=f'Price and Buy/Sell Signals with RFR Strategy', xaxis_title='Date', yaxis_title='Price', template="plotly_white", showlegend=True)
+        fig.update_layout(title=f'Price and Buy/Sell Signals with RFR Strategy', xaxis_title='Date', yaxis_title='Price', showlegend=True)
+
+        # Show the plot using Plotly
         st.plotly_chart(fig)
