@@ -14,6 +14,9 @@ import streamlit as st
 
 plt.style.use('seaborn')
 mpl.rcParams['font.family'] = 'serif'
+from ta.trend import MACD, AroonIndicator
+from ta.volume import OnBalanceVolumeIndicator
+from ta.momentum import StochasticOscillator
 
 
 class BacktestBase(object):
